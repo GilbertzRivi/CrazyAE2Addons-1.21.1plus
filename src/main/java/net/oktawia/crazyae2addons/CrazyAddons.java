@@ -1,5 +1,7 @@
 package net.oktawia.crazyae2addons;
 
+import net.oktawia.crazyae2addons.defs.Screens;
+import net.oktawia.crazyae2addons.defs.regs.*;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -38,12 +40,21 @@ public class CrazyAddons {
     public CrazyAddons(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::commonSetup);
         NeoForge.EVENT_BUS.register(this);
-        modEventBus.addListener(this::addCreative);
+
+        CrazyCreativeTabRegistrar.register(modEventBus);
+
+        CrazyItemRegistrar.register(modEventBus);
+        CrazyBlockRegistrar.register(modEventBus);
+        CrazyBlockEntityRegistrar.register(modEventBus);
+        CrazyMenuRegistrar.register(modEventBus);
+        modEventBus.addListener(Screens::register);
+
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
         LOGGER.info("CrazyAE2Addons loading...");
+        event.enqueueWork(CrazyBlockEntityRegistrar::runBlockEntitySetup);
     }
 
     @SubscribeEvent

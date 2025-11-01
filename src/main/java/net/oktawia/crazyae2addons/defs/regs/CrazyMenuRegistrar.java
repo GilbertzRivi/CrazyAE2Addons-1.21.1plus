@@ -1,4 +1,35 @@
 package net.oktawia.crazyae2addons.defs.regs;
 
+import appeng.menu.AEBaseMenu;
+import appeng.menu.implementations.MenuTypeBuilder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.inventory.MenuType;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.oktawia.crazyae2addons.CrazyAddons;
+import net.oktawia.crazyae2addons.entities.BrokenPatternProviderBE;
+import net.oktawia.crazyae2addons.menus.BrokenPatternProviderMenu;
+
+
 public class CrazyMenuRegistrar {
+
+    public static final DeferredRegister<MenuType<?>> MENU_TYPES =
+            DeferredRegister.create(Registries.MENU, CrazyAddons.MODID);
+
+    private static <C extends AEBaseMenu, I> DeferredHolder<MenuType<?>, MenuType<C>> reg(
+            String id, MenuTypeBuilder.MenuFactory<C, I> factory, Class<I> host) {
+
+        return MENU_TYPES.register(id,
+                () -> MenuTypeBuilder.create(factory, host).build(id));
+    }
+
+    private static String id(String s) { return s; }
+
+    public static final DeferredHolder<MenuType<?>, MenuType<BrokenPatternProviderMenu>> BROKEN_PATTERN_PROVIDER_MENU =
+            reg(id("broken_pattern_provider"), BrokenPatternProviderMenu::new, BrokenPatternProviderBE.class);
+
+    public static void register(IEventBus eventBus) {
+        MENU_TYPES.register(eventBus);
+    }
 }

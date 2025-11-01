@@ -1,4 +1,34 @@
 package net.oktawia.crazyae2addons.defs.regs;
 
+import appeng.items.parts.PartItem;
+import net.minecraft.world.item.Item;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.oktawia.crazyae2addons.CrazyAddons;
+
+import java.util.List;
+
 public class CrazyItemRegistrar {
+    public static final DeferredRegister.Items ITEMS =
+            DeferredRegister.createItems(CrazyAddons.MODID);
+
+    public static List<? extends Item> getItems() {
+        return ITEMS.getEntries()
+                .stream()
+                .map(DeferredHolder::get)
+                .toList();
+    }
+
+    public static List<? extends Item> getParts() {
+        return ITEMS.getEntries()
+                .stream()
+                .map(DeferredHolder::get)
+                .filter(i -> i instanceof PartItem)
+                .toList();
+    }
+
+    public static void register(IEventBus eventBus) {
+        ITEMS.register(eventBus);
+    }
 }

@@ -1,4 +1,20 @@
 package net.oktawia.crazyae2addons.defs;
 
-public class Screens {
+import appeng.init.client.InitScreens;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.oktawia.crazyae2addons.defs.regs.CrazyMenuRegistrar;
+import net.oktawia.crazyae2addons.menus.BrokenPatternProviderMenu;
+import net.oktawia.crazyae2addons.screens.BrokenPatternProviderScreen;
+
+public final class Screens {
+
+    public static void register(RegisterMenuScreensEvent event) {
+
+        InitScreens.register(
+                event,
+                CrazyMenuRegistrar.BROKEN_PATTERN_PROVIDER_MENU.get(),
+                BrokenPatternProviderScreen<BrokenPatternProviderMenu>::new,
+                "/screens/broken_pattern_provider.json"
+        );
+    }
 }

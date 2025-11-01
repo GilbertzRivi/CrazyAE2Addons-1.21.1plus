@@ -1,9 +1,9 @@
 package net.oktawia.crazyae2addons.datagen;
 
 import net.minecraft.data.PackOutput;
+import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import net.neoforged.neoforge.registries.DeferredBlock;
 import net.oktawia.crazyae2addons.CrazyAddons;
 import net.oktawia.crazyae2addons.defs.regs.CrazyBlockRegistrar;
 
@@ -15,7 +15,7 @@ public class CrazyBlockStateProvider extends BlockStateProvider {
     @Override
     protected void registerStatesAndModels() {
         for (var block : CrazyBlockRegistrar.getBlocks()){
-//            if (block != CrazyBlockRegistrar.AMPERE_METER_BLOCK.get()
+            if (block != CrazyBlockRegistrar.BROKEN_PATTERN_PROVIDER_BLOCK.get()
 //                    && block != CrazyBlockRegistrar.SPAWNER_EXTRACTOR_CONTROLLER.get()
 //                    && block != CrazyBlockRegistrar.SPAWNER_EXTRACTOR_WALL.get()
 //                    && block != CrazyBlockRegistrar.MOB_FARM_CONTROLLER.get()
@@ -24,7 +24,7 @@ public class CrazyBlockStateProvider extends BlockStateProvider {
 //                    && block != CrazyBlockRegistrar.PENROSE_FRAME.get()
 //                    && block != CrazyBlockRegistrar.PENROSE_COIL.get()
 //                    && block != CrazyBlockRegistrar.CRAZY_PATTERN_PROVIDER_BLOCK.get()
-//                    && block != CrazyBlockRegistrar.BROKEN_PATTERN_PROVIDER_BLOCK.get()
+//                    && block != CrazyBlockRegistrar.AMPERE_METER_BLOCK.get()
 //                    && block != CrazyBlockRegistrar.ENERGY_STORAGE_CONTROLLER_BLOCK.get()
 //                    && block != CrazyBlockRegistrar.ENERGY_STORAGE_FRAME_BLOCK.get()
 //                    && block != CrazyBlockRegistrar.ENTROPY_CRADLE.get()
@@ -32,13 +32,14 @@ public class CrazyBlockStateProvider extends BlockStateProvider {
 //                    && block != CrazyBlockRegistrar.ENTROPY_CRADLE_CAPACITOR.get()
 //                    && block != CrazyBlockRegistrar.AUTO_BUILDER_BLOCK.get()
 //                    && block != CrazyBlockRegistrar.RESEARCH_STATION.get()
-//                    && block != CrazyBlockRegistrar.EJECTOR_BLOCK.get()){
-//            }
-            blockWithItem(block);
+//                    && block != CrazyBlockRegistrar.EJECTOR_BLOCK.get())
+            ){
+                blockWithItem(block);
+            }
         }
     }
 
-    private void blockWithItem(DeferredBlock<?> deferredBlock) {
-        simpleBlockWithItem(deferredBlock.get(), cubeAll(deferredBlock.get()));
+    private void blockWithItem(Block block) {
+        simpleBlockWithItem(block, cubeAll(block));
     }
 }

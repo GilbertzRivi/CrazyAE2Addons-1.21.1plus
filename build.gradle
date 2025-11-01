@@ -108,13 +108,10 @@ dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     implementation "appeng:appliedenergistics2:19.2.0-beta"
     compileOnly "appeng:appliedenergistics2:19.2.0-beta-api"
-    compileOnly annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1")
-    jarJar(implementation("io.github.llamalad7:mixinextras-neoforge:0.4.1")) { version { strictly "[0.4.1,)"; prefer "0.4.1" } }
-    additionalRuntimeClasspath "io.github.llamalad7:mixinextras-neoforge:0.4.1"
+    implementation "io.github.llamalad7:mixinextras-neoforge:0.4.1"
+    annotationProcessor "io.github.llamalad7:mixinextras-neoforge:0.4.1"
     implementation "de.mari_023:ae2wtlib_api:19.2.6"
     implementation "de.mari_023:ae2wtlib:19.2.6"
-    jarJar(implementation("de.mari_023:ae2wtlib_api:19.2.6")) { version { strictly("[19.2.0,)"); prefer("19.2.6") } }
-    implementation "curse.maven:applied-flux-965012:6649565"
     implementation "com.lowdragmc.ldlib:ldlib-neoforge-1.21.1:1.0.35.a"
     // OPTIONAL, FOR DEV
 }

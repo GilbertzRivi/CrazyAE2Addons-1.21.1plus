@@ -9,7 +9,7 @@
 - [ ] Auto Builder
 - [ ] Auto Builder Creative Supply
 - [ ] Auto Enchanter
-- [ ] Broken Pattern Provider
+- [x] Broken Pattern Provider
 - [ ] Crafting Scheduler
 - [ ] Crazy Pattern Provider
 - [ ] Data Processor

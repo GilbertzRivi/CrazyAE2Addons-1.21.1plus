@@ -50,7 +50,7 @@ public class CrazyRecipeProvider extends RecipeProvider implements IConditionBui
                 }
                 builder.unlockedBy(getHasName(AEBlocks.CONTROLLER.asItem()), has(AEBlocks.CONTROLLER.asItem()));
 
-                ResourceLocation recipeId = new ResourceLocation(
+                ResourceLocation recipeId = ResourceLocation.fromNamespaceAndPath(
                         CrazyAddons.MODID,
                         BuiltInRegistries.ITEM.getKey(entry.getKey()).getPath() + (recipeIndex == 0 ? "" : "_alt" + recipeIndex)
                 );
