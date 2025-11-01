@@ -5,145 +5,145 @@
 # Another attempt on porting to 1.21.1 neoforge
 
 ### BLOCKS
-[ ] - Ampere Meter
-[ ] - Auto Builder
-[ ] - Auto Builder Creative Supply
-[ ] - Auto Enchanter
-[ ] - Broken Pattern Provider
-[ ] - Crafting Scheduler
-[ ] - Crazy Pattern Provider
-[ ] - Data Processor
-[ ] - Ejector Block
-[ ] - Dense/Energy Storage Cells 1/4/16/64/256k
-[ ] - Energy Storage Controller
-[ ] - Energy Storage Frame
-[ ] - Energy Storage Port
-[ ] - Entropy Cradle
-[ ] - Entropy Cradle Capacitor
-[ ] - Entropy Cradle Controller
-[ ] - Impulsed Pattern Provider
-[ ] - Data Variables Controller
-[ ] - Mob Farm Collector
-[ ] - Mob Farm Controller
-[ ] - Mob Farm Damage
-[ ] - Mob Farm Input
-[ ] - Mob Farm Wall
-[ ] - Penrose Coil
-[ ] - Penrose Controller
-[ ] - Penrose Frame
-[ ] - Penrose Port
-[ ] - Recipe Fabricator
-[ ] - Reinforced Matter Condenser
-[ ] - Research Station
-[ ] - Signalling Interface
-[ ] - Spawner Extractor Controller
-[ ] - Spawner Extractor Wall
-[ ] - Research Stabilizer Block
-[ ] - Super Singularity Block
+- [ ] Ampere Meter
+- [ ] Auto Builder
+- [ ] Auto Builder Creative Supply
+- [ ] Auto Enchanter
+- [ ] Broken Pattern Provider
+- [ ] Crafting Scheduler
+- [ ] Crazy Pattern Provider
+- [ ] Data Processor
+- [ ] Ejector Block
+- [ ] Dense/Energy Storage Cells 1/4/16/64/256k
+- [ ] Energy Storage Controller
+- [ ] Energy Storage Frame
+- [ ] Energy Storage Port
+- [ ] Entropy Cradle
+- [ ] Entropy Cradle Capacitor
+- [ ] Entropy Cradle Controller
+- [ ] Impulsed Pattern Provider
+- [ ] Data Variables Controller
+- [ ] Mob Farm Collector
+- [ ] Mob Farm Controller
+- [ ] Mob Farm Damage
+- [ ] Mob Farm Input
+- [ ] Mob Farm Wall
+- [ ] Penrose Coil
+- [ ] Penrose Controller
+- [ ] Penrose Frame
+- [ ] Penrose Port
+- [ ] Recipe Fabricator
+- [ ] Reinforced Matter Condenser
+- [ ] Research Station
+- [ ] Signalling Interface
+- [ ] Spawner Extractor Controller
+- [ ] Spawner Extractor Wall
+- [ ] Research Stabilizer Block
+- [ ] Super Singularity Block
 
 ### COMPAT
-[ ] - Apotheosis Auto Enchanter
-[ ] - Computer Craft Data Extractor + item
-[ ] - GregTech Ampere Meter
-[ ] - GregTech Energy Exporter Part + item
-[ ] - Wireless terminals
+- [ ] Apotheosis Auto Enchanter
+- [ ] Computer Craft Data Extractor + item
+- [ ] GregTech Ampere Meter
+- [ ] GregTech Energy Exporter Part + item
+- [ ] Wireless terminals
 
 ### FLUID
-[ ] - Researach Fluid
+- [ ] Researach Fluid
 
 ### ITEMS / PARTS
-[ ] - Builder Pattern
-[ ] - Circuit Upgrade Card
-[ ] - CPU Prio Tuner
-[ ] - Crazy Calculator
-[ ] - Crazy Emitter Multiplier
-[ ] - Crazy Pattern Modifier
-[ ] - Crazy Pattern Multiplier
-[ ] - Crazy Pattern Provider Upgrade
-[ ] - Research Drive
-[ ] - Data Flow Item
-[ ] - XP Upgrade Card
-[ ] - Logic Card
-[ ] - Looting Upgrade Card
-[ ] - Virtual Mob Representation (this thing to place mob keys in patterns)
-[ ] - NBT View Cell (if possible)
-[ ] - Structure Gadget
-[ ] - Structure Pattern Copy Debug Item (dev tool)
-[ ] - Super Singularity
-[ ] - Tag View Cell
-[ ] - Unassembled Crazy Pattern Provider
-[ ] - Wireless Redstone Terminal
-[ ] - XP Shard 
+- [ ] Builder Pattern
+- [ ] Circuit Upgrade Card
+- [ ] CPU Prio Tuner
+- [ ] Crazy Calculator
+- [ ] Crazy Emitter Multiplier
+- [ ] Crazy Pattern Modifier
+- [ ] Crazy Pattern Multiplier
+- [ ] Crazy Pattern Provider Upgrade
+- [ ] Research Drive
+- [ ] Data Flow Item
+- [ ] XP Upgrade Card
+- [ ] Logic Card
+- [ ] Looting Upgrade Card
+- [ ] Virtual Mob Representation (this thing to place mob keys in patterns)
+- [ ] NBT View Cell (if possible)
+- [ ] Structure Gadget
+- [ ] Structure Pattern Copy Debug Item (dev tool)
+- [ ] Super Singularity
+- [ ] Tag View Cell
+- [ ] Unassembled Crazy Pattern Provider
+- [ ] Wireless Redstone Terminal
+- [ ] XP Shard 
 
 ### MIXINS 
-[ ] - CPU Priorities 
-[ ] - CPU Priorities for Quantum CPU
-[ ] - Ignore NBT 
-[ ] - Ignore NBT for Quantum CPU
-[ ] - Impulsed Pattern Provider
-[ ] - Impulsed Pattern Provider For Quantum CPU
-[ ] - Set GregTech circuit
-[ ] - Set GregTech circuit in a subnet
-[ ] - Set GregTech circuit through pattern P2P
-[ ] - Set GregTech circuit through pattern P2P and a subnet
-[ ] - Set GregTech circuit for Quantum CPU
-[ ] - Sorting CPUs in terminal view + tooltips 
-[ ] - Cancel all crafting jobs button
-[ ] - Wormhole P2P remote interactions
-[ ] - Custom View Cells
-[ ] - Scrollable Inventories
+- [ ] CPU Priorities 
+- [ ] CPU Priorities for Quantum CPU
+- [ ] Ignore NBT 
+- [ ] Ignore NBT for Quantum CPU
+- [ ] Impulsed Pattern Provider
+- [ ] Impulsed Pattern Provider For Quantum CPU
+- [ ] Set GregTech circuit
+- [ ] Set GregTech circuit in a subnet
+- [ ] Set GregTech circuit through pattern P2P
+- [ ] Set GregTech circuit through pattern P2P and a subnet
+- [ ] Set GregTech circuit for Quantum CPU
+- [ ] Sorting CPUs in terminal view + tooltips 
+- [ ] Cancel all crafting jobs button
+- [ ] Wormhole P2P remote interactions
+- [ ] Custom View Cells
+- [ ] Scrollable Inventories
 
 ### MOB STORAGE 
-[ ] - Rendering mobs in interface / on block
-[ ] - Mob Annihilation Plane
-[ ] - Mob Export Bus
-[ ] - Mob Formation Plane
-[ ] - MobKeys in general
-[ ] - Mob Placement Strategies
-[ ] - Mob Storage Cells
+- [ ] Rendering mobs in interface / on block
+- [ ] Mob Annihilation Plane
+- [ ] Mob Export Bus
+- [ ] Mob Formation Plane
+- [ ] MobKeys in general
+- [ ] Mob Placement Strategies
+- [ ] Mob Storage Cells
 
 ### PARTS 
-[ ] - Chunky Fluid P2P Tunnel
-[ ] - Data Extractor
-[ ] - Display
-[ ] - Energy Exporter
-[ ] - Energy Interface
-[ ] - Entity Ticker
-[ ] - Extracting FE P2P Tunnel
-[ ] - Extracting Fluid P2P Tunnel
-[ ] - Extracting Item P2P Tunnel
-[ ] - NBT Export Bus (if possible)
-[ ] - NBT Storage Bus (if possible)
-[ ] - Player Data Extractor
-[ ] - Round Robin Item P2P Tunnel
-[ ] - Redstone Emitter
-[ ] - Redstone Terminal
-[ ] - Variable Terminal
-[ ] - Wormhole P2P Tunnel
+- [ ] Chunky Fluid P2P Tunnel
+- [ ] Data Extractor
+- [ ] Display
+- [ ] Energy Exporter
+- [ ] Energy Interface
+- [ ] Entity Ticker
+- [ ] Extracting FE P2P Tunnel
+- [ ] Extracting Fluid P2P Tunnel
+- [ ] Extracting Item P2P Tunnel
+- [ ] NBT Export Bus (if possible)
+- [ ] NBT Storage Bus (if possible)
+- [ ] Player Data Extractor
+- [ ] Round Robin Item P2P Tunnel
+- [ ] Redstone Emitter
+- [ ] Redstone Terminal
+- [ ] Variable Terminal
+- [ ] Wormhole P2P Tunnel
 
 ### RECIPES 
-[ ] - Data Driven Cradle Recipes
-[ ] - Data Driven Fabrication Recipes
-[ ] - Data Driven Research Recipes
+- [ ] Data Driven Cradle Recipes
+- [ ] Data Driven Fabrication Recipes
+- [ ] Data Driven Research Recipes
 
 ### RENDER
-[ ] - Autobuilder Preview
-[ ] - Energy Storage Preview
-[ ] - Entropy Cradle Preview
-[ ] - Held Structure Gadget Preview
-[ ] - Mob Farm Preview
-[ ] - Penrose Sphere Preview
-[ ] - Research Station Preview
-[ ] - Spawner Extractor Preview
-[ ] - Display Glass on previews
-[ ] - Tooltip when looking on blocks on previews
+- [ ] Autobuilder Preview
+- [ ] Energy Storage Preview
+- [ ] Entropy Cradle Preview
+- [ ] Held Structure Gadget Preview
+- [ ] Mob Farm Preview
+- [ ] Penrose Sphere Preview
+- [ ] Research Station Preview
+- [ ] Spawner Extractor Preview
+- [ ] Display Glass on previews
+- [ ] Tooltip when looking on blocks on previews
 
 ### JEI / EMI
-[ ] - Multiblock Previews
-[ ] - Cradle Recipes
-[ ] - Fabrication Recipes
-[ ] - Research Recipes
-[ ] - Super Singularity Recipe Preview
+- [ ] Multiblock Previews
+- [ ] Cradle Recipes
+- [ ] Fabrication Recipes
+- [ ] Research Recipes
+- [ ] Super Singularity Recipe Preview
 
 ---
 
