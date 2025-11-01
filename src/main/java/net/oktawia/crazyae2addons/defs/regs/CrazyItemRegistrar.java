@@ -4,8 +4,10 @@ import appeng.items.parts.PartItem;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.oktawia.crazyae2addons.CrazyAddons;
+import net.oktawia.crazyae2addons.items.CrazyPatternProviderUpgrade;
 
 import java.util.List;
 
@@ -27,6 +29,9 @@ public class CrazyItemRegistrar {
                 .filter(i -> i instanceof PartItem)
                 .toList();
     }
+
+    public static final DeferredItem<Item> CRAZY_PATTERN_PROVIDER_UPGRADE = ITEMS.register("crazy_pattern_provider_upgrade",
+            () -> new CrazyPatternProviderUpgrade(new Item.Properties()));
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

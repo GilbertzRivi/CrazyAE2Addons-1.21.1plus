@@ -7,9 +7,12 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.oktawia.crazyae2addons.CrazyAddons;
 import net.oktawia.crazyae2addons.blocks.BrokenPatternProviderBlock;
+import net.oktawia.crazyae2addons.blocks.CrazyPatternProviderBlock;
+import net.oktawia.crazyae2addons.items.CrazyPatternProviderBlockItem;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -42,6 +45,13 @@ public class CrazyBlockRegistrar {
     private static <T extends Block> void registerBlockItem(String name, DeferredBlock<T> block) {
         BLOCK_ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
     }
+
+    public static final DeferredBlock<CrazyPatternProviderBlock> CRAZY_PATTERN_PROVIDER_BLOCK =
+            BLOCKS.register("crazy_pattern_provider", CrazyPatternProviderBlock::new);
+
+    public static final DeferredItem<BlockItem> CRAZY_PATTERN_PROVIDER_BLOCK_ITEM =
+            BLOCK_ITEMS.register("crazy_pattern_provider",
+                    () -> new CrazyPatternProviderBlockItem(CRAZY_PATTERN_PROVIDER_BLOCK.get(), new Item.Properties()));
 
     public static final DeferredBlock<BrokenPatternProviderBlock> BROKEN_PATTERN_PROVIDER_BLOCK = registerBlock(
             "broken_pattern_provider", BrokenPatternProviderBlock::new);

@@ -10,6 +10,7 @@ import net.neoforged.neoforge.registries.DeferredHolder; // <-- Zmiana z Registr
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.oktawia.crazyae2addons.CrazyAddons;
 import net.oktawia.crazyae2addons.entities.BrokenPatternProviderBE;
+import net.oktawia.crazyae2addons.entities.CrazyPatternProviderBE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,9 @@ public class CrazyBlockEntityRegistrar {
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BrokenPatternProviderBE>> BROKEN_PATTERN_PROVIDER_BE =
             reg("broken_pattern_provider", CrazyBlockRegistrar.BROKEN_PATTERN_PROVIDER_BLOCK, BrokenPatternProviderBE::new, BrokenPatternProviderBE.class);
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CrazyPatternProviderBE>> CRAZY_PATTERN_PROVIDER_BE =
+            reg("crazy_pattern_provider", CrazyBlockRegistrar.CRAZY_PATTERN_PROVIDER_BLOCK, CrazyPatternProviderBE::new, CrazyPatternProviderBE.class);
 
     public static void runBlockEntitySetup() {
         BLOCK_ENTITY_SETUP.forEach(Runnable::run);

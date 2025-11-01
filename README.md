@@ -11,7 +11,7 @@
 - [ ] Auto Enchanter
 - [x] Broken Pattern Provider
 - [ ] Crafting Scheduler
-- [ ] Crazy Pattern Provider
+- [x] Crazy Pattern Provider
 - [ ] Data Processor
 - [ ] Ejector Block
 - [ ] Dense/Energy Storage Cells 1/4/16/64/256k

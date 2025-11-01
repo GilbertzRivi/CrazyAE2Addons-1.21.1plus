@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "net.oktawia.crazyae2addons.mixins",
+  "compatibilityLevel": "JAVA_21",
+  "plugin": "net.oktawia.crazyae2addons.mixins.Plugin",
+  "mixins": [
+    "PatternProviderBlockEntityAccessor",
+    "SlotAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

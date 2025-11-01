@@ -1,0 +1,35 @@
+modLoader = "javafml"
+loaderVersion = "[2,)"
+license = "All Rights Reserved"
+
+[[mods]]
+modId = "crazyae2addons"
+version = "1.17.1"
+displayName = "Crazy AE2 Addons"
+authors = "Oktawia"
+description = "Probably the craziest AE2 addon out there"
+
+[[mixins]]
+type = "CONFIG"
+config = "mixins.crazyae2addons.json"
+
+[[dependencies.crazyae2addons]]
+modId = "neoforge"
+type = "REQUIRED"
+versionRange = "[2.1,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.crazyae2addons]]
+modId = "minecraft"
+type = "REQUIRED"
+versionRange = "[1.21.1]"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.crazyae2addons]]
+modId = "ae2"
+type = "REQUIRED"
+versionRange = "[0,)"
+ordering = "AFTER"
+side = "BOTH"
