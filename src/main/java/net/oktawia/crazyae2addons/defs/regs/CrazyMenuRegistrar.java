@@ -8,9 +8,13 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.oktawia.crazyae2addons.CrazyAddons;
+import net.oktawia.crazyae2addons.entities.AutoBuilderBE;
 import net.oktawia.crazyae2addons.entities.BrokenPatternProviderBE;
 import net.oktawia.crazyae2addons.entities.CrazyPatternProviderBE;
+import net.oktawia.crazyae2addons.logic.BuilderPatternHost;
+import net.oktawia.crazyae2addons.menus.AutoBuilderMenu;
 import net.oktawia.crazyae2addons.menus.BrokenPatternProviderMenu;
+import net.oktawia.crazyae2addons.menus.BuilderPatternMenu;
 import net.oktawia.crazyae2addons.menus.CrazyPatternProviderMenu;
 
 
@@ -33,6 +37,12 @@ public class CrazyMenuRegistrar {
 
     public static final DeferredHolder<MenuType<?>, MenuType<CrazyPatternProviderMenu>> CRAZY_PATTERN_PROVIDER_MENU =
             reg(id("crazy_pattern_provider"), CrazyPatternProviderMenu::new, CrazyPatternProviderBE.class);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<AutoBuilderMenu>> AUTO_BUILDER_MENU =
+            reg(id("auto_builder"), AutoBuilderMenu::new, AutoBuilderBE.class);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<BuilderPatternMenu>> BUILDER_PATTERN_MENU =
+            reg(id("builder_pattern"), BuilderPatternMenu::new, BuilderPatternHost.class);
 
     public static void register(IEventBus eventBus) {
         MENU_TYPES.register(eventBus);

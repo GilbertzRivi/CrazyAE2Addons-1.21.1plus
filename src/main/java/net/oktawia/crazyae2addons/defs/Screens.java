@@ -3,9 +3,13 @@ package net.oktawia.crazyae2addons.defs;
 import appeng.init.client.InitScreens;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.oktawia.crazyae2addons.defs.regs.CrazyMenuRegistrar;
+import net.oktawia.crazyae2addons.menus.AutoBuilderMenu;
 import net.oktawia.crazyae2addons.menus.BrokenPatternProviderMenu;
+import net.oktawia.crazyae2addons.menus.BuilderPatternMenu;
 import net.oktawia.crazyae2addons.menus.CrazyPatternProviderMenu;
+import net.oktawia.crazyae2addons.screens.AutoBuilderScreen;
 import net.oktawia.crazyae2addons.screens.BrokenPatternProviderScreen;
+import net.oktawia.crazyae2addons.screens.BuilderPatternScreen;
 import net.oktawia.crazyae2addons.screens.CrazyPatternProviderScreen;
 
 public final class Screens {
@@ -23,6 +27,18 @@ public final class Screens {
                 CrazyMenuRegistrar.CRAZY_PATTERN_PROVIDER_MENU.get(),
                 CrazyPatternProviderScreen<CrazyPatternProviderMenu>::new,
                 "/screens/crazy_pattern_provider.json"
+        );
+        InitScreens.register(
+                event,
+                CrazyMenuRegistrar.AUTO_BUILDER_MENU.get(),
+                AutoBuilderScreen<AutoBuilderMenu>::new,
+                "/screens/auto_builder.json"
+        );
+        InitScreens.register(
+                event,
+                CrazyMenuRegistrar.BUILDER_PATTERN_MENU.get(),
+                BuilderPatternScreen<BuilderPatternMenu>::new,
+                "/screens/builder_pattern.json"
         );
     }
 }

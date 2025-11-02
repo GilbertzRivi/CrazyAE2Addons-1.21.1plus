@@ -6,8 +6,8 @@
 
 ### BLOCKS
 - [ ] Ampere Meter
-- [ ] Auto Builder
-- [ ] Auto Builder Creative Supply
+- [x] Auto Builder
+- [x] Auto Builder Creative Supply
 - [ ] Auto Enchanter
 - [x] Broken Pattern Provider
 - [ ] Crafting Scheduler
@@ -52,14 +52,14 @@
 - [ ] Researach Fluid
 
 ### ITEMS / PARTS
-- [ ] Builder Pattern
+- [x] Builder Pattern
 - [ ] Circuit Upgrade Card
 - [ ] CPU Prio Tuner
 - [ ] Crazy Calculator
 - [ ] Crazy Emitter Multiplier
 - [ ] Crazy Pattern Modifier
 - [ ] Crazy Pattern Multiplier
-- [ ] Crazy Pattern Provider Upgrade
+- [x] Crazy Pattern Provider Upgrade
 - [ ] Research Drive
 - [ ] Data Flow Item
 - [ ] XP Upgrade Card
@@ -127,7 +127,7 @@
 - [ ] Data Driven Research Recipes
 
 ### RENDER
-- [ ] Autobuilder Preview
+- [x] Autobuilder Preview
 - [ ] Energy Storage Preview
 - [ ] Entropy Cradle Preview
 - [ ] Held Structure Gadget Preview

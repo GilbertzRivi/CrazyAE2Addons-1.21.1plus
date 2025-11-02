@@ -9,6 +9,8 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder; // <-- Zmiana z RegistryObject
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.oktawia.crazyae2addons.CrazyAddons;
+import net.oktawia.crazyae2addons.entities.AutoBuilderBE;
+import net.oktawia.crazyae2addons.entities.AutoBuilderCreativeSupplyBE;
 import net.oktawia.crazyae2addons.entities.BrokenPatternProviderBE;
 import net.oktawia.crazyae2addons.entities.CrazyPatternProviderBE;
 
@@ -44,6 +46,12 @@ public class CrazyBlockEntityRegistrar {
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CrazyPatternProviderBE>> CRAZY_PATTERN_PROVIDER_BE =
             reg("crazy_pattern_provider", CrazyBlockRegistrar.CRAZY_PATTERN_PROVIDER_BLOCK, CrazyPatternProviderBE::new, CrazyPatternProviderBE.class);
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AutoBuilderBE>> AUTO_BUILDER_BE =
+            reg("auto_builder", CrazyBlockRegistrar.AUTO_BUILDER_BLOCK, AutoBuilderBE::new, AutoBuilderBE.class);
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AutoBuilderCreativeSupplyBE>> AUTO_BUILDER_CREATIVE_SUPPLY_BE =
+            reg("auto_builder_creative_supply", CrazyBlockRegistrar.AUTO_BUILDER_CREATIVE_SUPPLY_BLOCK, AutoBuilderCreativeSupplyBE::new, AutoBuilderCreativeSupplyBE.class);
 
     public static void runBlockEntitySetup() {
         BLOCK_ENTITY_SETUP.forEach(Runnable::run);

@@ -1,6 +1,9 @@
 {
+  "block.crazyae2addons.auto_builder": "Auto Builder",
+  "block.crazyae2addons.auto_builder_creative_supply": "Auto Builder Creative Supply",
   "block.crazyae2addons.broken_pattern_provider": "Broken Pattern Provider",
   "block.crazyae2addons.crazy_pattern_provider": "Crazy Pattern Provider",
   "creativetab.title": "Crazy AE2 Addons",
+  "item.crazyae2addons.builder_pattern": "Builder Pattern",
   "item.crazyae2addons.crazy_pattern_provider_upgrade": "Crazy Pattern Provider Upgrade"
 }

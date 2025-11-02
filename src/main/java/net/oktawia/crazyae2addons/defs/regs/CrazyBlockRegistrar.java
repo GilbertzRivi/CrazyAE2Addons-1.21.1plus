@@ -10,6 +10,8 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.oktawia.crazyae2addons.CrazyAddons;
+import net.oktawia.crazyae2addons.blocks.AutoBuilderBlock;
+import net.oktawia.crazyae2addons.blocks.AutoBuilderCreativeSupplyBlock;
 import net.oktawia.crazyae2addons.blocks.BrokenPatternProviderBlock;
 import net.oktawia.crazyae2addons.blocks.CrazyPatternProviderBlock;
 import net.oktawia.crazyae2addons.items.CrazyPatternProviderBlockItem;
@@ -55,6 +57,12 @@ public class CrazyBlockRegistrar {
 
     public static final DeferredBlock<BrokenPatternProviderBlock> BROKEN_PATTERN_PROVIDER_BLOCK = registerBlock(
             "broken_pattern_provider", BrokenPatternProviderBlock::new);
+
+    public static final DeferredBlock<AutoBuilderBlock> AUTO_BUILDER_BLOCK = registerBlock(
+            "auto_builder", AutoBuilderBlock::new);
+
+    public static final DeferredBlock<AutoBuilderCreativeSupplyBlock> AUTO_BUILDER_CREATIVE_SUPPLY_BLOCK = registerBlock(
+            "auto_builder_creative_supply", AutoBuilderCreativeSupplyBlock::new);
 
     public static void register(IEventBus eventBus) {
         BLOCKS.register(eventBus);

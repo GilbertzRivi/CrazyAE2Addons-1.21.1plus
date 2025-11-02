@@ -17,6 +17,7 @@ public class CrazyBlockStateProvider extends BlockStateProvider {
         for (var block : CrazyBlockRegistrar.getBlocks()){
             if (block != CrazyBlockRegistrar.BROKEN_PATTERN_PROVIDER_BLOCK.get()
                     && block != CrazyBlockRegistrar.CRAZY_PATTERN_PROVIDER_BLOCK.get()
+                    && block != CrazyBlockRegistrar.AUTO_BUILDER_BLOCK.get()
 //                    && block != CrazyBlockRegistrar.SPAWNER_EXTRACTOR_CONTROLLER.get()
 //                    && block != CrazyBlockRegistrar.SPAWNER_EXTRACTOR_WALL.get()
 //                    && block != CrazyBlockRegistrar.MOB_FARM_CONTROLLER.get()
@@ -30,7 +31,6 @@ public class CrazyBlockStateProvider extends BlockStateProvider {
 //                    && block != CrazyBlockRegistrar.ENTROPY_CRADLE.get()
 //                    && block != CrazyBlockRegistrar.ENTROPY_CRADLE_CONTROLLER.get()
 //                    && block != CrazyBlockRegistrar.ENTROPY_CRADLE_CAPACITOR.get()
-//                    && block != CrazyBlockRegistrar.AUTO_BUILDER_BLOCK.get()
 //                    && block != CrazyBlockRegistrar.RESEARCH_STATION.get()
 //                    && block != CrazyBlockRegistrar.EJECTOR_BLOCK.get())
             ){

@@ -9,7 +9,10 @@ import net.neoforged.fml.ModLoader;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.oktawia.crazyae2addons.defs.Screens;
+import net.oktawia.crazyae2addons.defs.UpgradeCards;
 import net.oktawia.crazyae2addons.defs.regs.*;
+import net.oktawia.crazyae2addons.network.SendLongStringToClientPacket;
+import net.oktawia.crazyae2addons.network.SendLongStringToServerPacket;
 import net.oktawia.crazyae2addons.network.SyncBlockClientPacket; // Zaimportuj swoje pakiety
 // Zaimportuj tutaj wszystkie swoje klasy pakietów
 // import net.oktawia.crazyae2addons.network.*;
@@ -56,7 +59,10 @@ public class CrazyAddons {
 
     private void commonSetup(FMLCommonSetupEvent event) {
         LOGGER.info("CrazyAE2Addons loading...");
-        event.enqueueWork(CrazyBlockEntityRegistrar::runBlockEntitySetup);
+        event.enqueueWork( () -> {
+            new UpgradeCards(event);
+            CrazyBlockEntityRegistrar.runBlockEntitySetup();
+        });
     }
 
     private void registerPayloadHandlers(final RegisterPayloadHandlersEvent event) {
@@ -71,6 +77,16 @@ public class CrazyAddons {
                 UpdatePatternsPacket.TYPE,
                 UpdatePatternsPacket.STREAM_CODEC,
                 UpdatePatternsPacket::handle
+        );
+        registrar.playToClient(
+                SendLongStringToClientPacket.TYPE,
+                SendLongStringToClientPacket.STREAM_CODEC,
+                SendLongStringToClientPacket::handle
+        );
+        registrar.playToServer(
+                SendLongStringToServerPacket.TYPE,
+                SendLongStringToServerPacket.STREAM_CODEC,
+                SendLongStringToServerPacket::handle
         );
     }
 
