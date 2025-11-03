@@ -5,7 +5,7 @@
 # Another attempt on porting to 1.21.1 neoforge
 
 ### BLOCKS
-- [ ] Ampere Meter
+- [x] Ampere Meter
 - [x] Auto Builder
 - [x] Auto Builder Creative Supply
 - [ ] Auto Enchanter
@@ -44,7 +44,7 @@
 ### COMPAT
 - [ ] Apotheosis Auto Enchanter
 - [ ] Computer Craft Data Extractor + item
-- [ ] GregTech Ampere Meter
+- [x] GregTech Ampere Meter
 - [ ] GregTech Energy Exporter Part + item
 - [ ] Wireless terminals
 
@@ -89,9 +89,9 @@
 - [ ] Set GregTech circuit for Quantum CPU
 - [ ] Sorting CPUs in terminal view + tooltips 
 - [ ] Cancel all crafting jobs button
-- [ ] Wormhole P2P remote interactions
+- [x] Wormhole P2P remote interactions
 - [ ] Custom View Cells
-- [ ] Scrollable Inventories
+- [x] Scrollable Inventories
 
 ### MOB STORAGE 
 - [ ] Rendering mobs in interface / on block
@@ -119,7 +119,7 @@
 - [ ] Redstone Emitter
 - [ ] Redstone Terminal
 - [ ] Variable Terminal
-- [ ] Wormhole P2P Tunnel
+- [x] Wormhole P2P Tunnel
 
 ### RECIPES 
 - [ ] Data Driven Cradle Recipes

@@ -16,6 +16,7 @@ import net.oktawia.crazyae2addons.defs.regs.*;
 import net.oktawia.crazyae2addons.entities.AmpereMeterBE;
 import net.oktawia.crazyae2addons.items.Nokia3310;
 import net.oktawia.crazyae2addons.logic.BuildScheduler;
+import net.oktawia.crazyae2addons.misc.WormholeAnchor;
 import net.oktawia.crazyae2addons.network.SendLongStringToClientPacket;
 import net.oktawia.crazyae2addons.network.SendLongStringToServerPacket;
 import net.oktawia.crazyae2addons.network.SyncBlockClientPacket; // Zaimportuj swoje pakiety
@@ -23,6 +24,7 @@ import net.oktawia.crazyae2addons.network.SyncBlockClientPacket; // Zaimportuj s
 // import net.oktawia.crazyae2addons.network.*;
 
 import net.oktawia.crazyae2addons.network.UpdatePatternsPacket;
+import net.oktawia.crazyae2addons.parts.WormholeP2PTunnelPart;
 import net.oktawia.crazyae2addons.renderer.PreviewTooltipRenderer;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
@@ -62,6 +64,7 @@ public class CrazyAddons {
 
         NeoForge.EVENT_BUS.register(this);
         NeoForge.EVENT_BUS.register(BuildScheduler.class);
+        NeoForge.EVENT_BUS.register(WormholeAnchor.class);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, CrazyConfig.COMMON_SPEC);
     }
@@ -162,13 +165,22 @@ public class CrazyAddons {
                 (be, context) -> be.euLogic
         );
 
-//        var partEvent = new RegisterPartCapabilitiesEvent();
-//        partEvent.addHostType(AEBlockEntities.CABLE_BUS.get());
-//        partEvent.register(
-//                Capabilities.ItemHandler.BLOCK,
-//                (part, context) -> part.getExposedApi(),
-//                RRItemP2PTunnel.class);
-//        ModLoader.postEvent(partEvent);
-//        RegisterPartCapabilitiesEventInternal.register(partEvent, event);
+        var partEvent = new RegisterPartCapabilitiesEvent();
+        partEvent.addHostType(AEBlockEntities.CABLE_BUS.get());
+
+        partEvent.register(Capabilities.ItemHandler.BLOCK,
+                (WormholeP2PTunnelPart part, Direction ctx) -> part.getExposedItemApi(),
+                WormholeP2PTunnelPart.class);
+
+        partEvent.register(Capabilities.FluidHandler.BLOCK,
+                (WormholeP2PTunnelPart part, Direction ctx) -> part.getExposedFluidApi(),
+                WormholeP2PTunnelPart.class);
+
+        partEvent.register(Capabilities.EnergyStorage.BLOCK,
+                (WormholeP2PTunnelPart part, Direction ctx) -> part.getExposedEnergyApi(),
+                WormholeP2PTunnelPart.class);
+
+        ModLoader.postEvent(partEvent);
+        RegisterPartCapabilitiesEventInternal.register(partEvent, event);
     }
 }

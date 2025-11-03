@@ -5,6 +5,7 @@
   "plugin": "net.oktawia.crazyae2addons.mixins.Plugin",
   "mixins": [
     "PatternProviderBlockEntityAccessor",
+    "PlayerCanInteractMixin",
     "SlotAccessor"
   ],
   "injectors": {
