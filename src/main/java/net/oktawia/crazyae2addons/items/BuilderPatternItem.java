@@ -11,9 +11,8 @@ import appeng.menu.locator.MenuLocators;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponents; // <-- NOWY IMPORT
-import net.minecraft.core.registries.BuiltInRegistries; // <-- NOWY IMPORT
-import net.minecraft.nbt.CompoundTag; // <-- NOWY IMPORT
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -22,15 +21,13 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.CustomData; // <-- NOWY IMPORT
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.storage.LevelResource;
-// usunięto 'net.minecraftforge.registries.ForgeRegistries'
 import net.minecraft.world.phys.BlockHitResult;
+import net.oktawia.crazyae2addons.defs.regs.CrazyDataComponents;
 import net.oktawia.crazyae2addons.defs.regs.CrazyMenuRegistrar;
 import net.oktawia.crazyae2addons.logic.BuilderPatternHost;
 import net.oktawia.crazyae2addons.misc.ProgramExpander;
@@ -44,6 +41,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -58,7 +56,7 @@ public class BuilderPatternItem extends AEBaseItem implements IMenuItem {
 
 
     public BuilderPatternItem(Properties props) {
-        super(props.stacksTo(1));
+        super(props.stacksTo(1).component(CrazyDataComponents.BUILDER_PROGRAM_DATA.get(), new CompoundTag()));
     }
 
     @Override
@@ -83,12 +81,9 @@ public class BuilderPatternItem extends AEBaseItem implements IMenuItem {
                     Math.max(cornerA.getY(), cornerB.getY()),
                     Math.max(cornerA.getZ(), cornerB.getZ())
             );
-
             Basis basis = Basis.forFacing(originFacing);
-
             Map<String, Integer> blockMap = new LinkedHashMap<>();
             int blockIdCounter = 1;
-
             StringBuilder pattern = new StringBuilder();
             pattern.append("H");
             BlockPos cursorLocal = BlockPos.ZERO;
@@ -108,15 +103,14 @@ public class BuilderPatternItem extends AEBaseItem implements IMenuItem {
 
                         StringBuilder fullId = new StringBuilder(blockId.toString());
 
-                        if (!state.getValues().isEmpty()) {
-                            fullId.append("[");
-                            boolean first = true;
-                            for (Map.Entry<Property<?>, Comparable<?>> entry : state.getValues().entrySet()) {
-                                if (!first) fullId.append(",");
-                                fullId.append(entry.getKey().getName()).append("=").append(entry.getValue());
-                                first = false;
-                            }
-                            fullId.append("]");
+                        String properties = state.getValues().entrySet().stream()
+                                .map(entry -> {
+                                    return entry.getKey().getName() + "=" + entry.getValue().toString();
+                                })
+                                .collect(Collectors.joining(","));
+
+                        if (!properties.isEmpty()) {
+                            fullId.append("[").append(properties).append("]");
                         }
 
                         String key = fullId.toString();
@@ -136,22 +130,21 @@ public class BuilderPatternItem extends AEBaseItem implements IMenuItem {
                 header.append(entry.getValue()).append("(").append(entry.getKey()).append("),\n");
             }
             if (!header.isEmpty()) header.setLength(header.length() - 2);
-
             String finalCode = header + "\n||\n" + pattern;
+
 
             ProgramExpander.Result result = ProgramExpander.expand(finalCode);
             if (result.success) {
                 String programId = UUID.randomUUID().toString();
 
-                CustomData customData = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
-                CompoundTag tag = customData.copyTag();
+                CompoundTag tag = stack.getOrDefault(CrazyDataComponents.BUILDER_PROGRAM_DATA.get(), new CompoundTag()).copy();
 
                 tag.putBoolean("code", true);
                 tag.putString("program_id", programId);
                 tag.putInt("delay", 0);
                 tag.putString("srcFacing", originFacing.getName());
 
-                stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+                stack.set(CrazyDataComponents.BUILDER_PROGRAM_DATA.get(), tag);
 
                 saveProgramToFile(programId, finalCode, p.getServer());
                 p.displayClientMessage(Component.literal("Saved pattern. Length: " + finalCode.length()), true);
@@ -185,7 +178,6 @@ public class BuilderPatternItem extends AEBaseItem implements IMenuItem {
     }
 
     private static String moveCursorRelative(BlockPos fromLocal, BlockPos toLocal) {
-        // ... (bez zmian)
         StringBuilder moves = new StringBuilder();
         int dx = toLocal.getX() - fromLocal.getX();
         int dy = toLocal.getY() - fromLocal.getY();
@@ -221,7 +213,6 @@ public class BuilderPatternItem extends AEBaseItem implements IMenuItem {
     }
 
     private static BlockPos worldToLocal(BlockPos worldPos, BlockPos origin, Basis b) {
-        // ... (bez zmian)
         int dx = worldPos.getX() - origin.getX();
         int dy = worldPos.getY() - origin.getY();
         int dz = worldPos.getZ() - origin.getZ();
@@ -293,8 +284,7 @@ public class BuilderPatternItem extends AEBaseItem implements IMenuItem {
         String updated = (header.isEmpty() ? "" : header + SEP) + bodyOut;
 
         try {
-            CustomData customData = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
-            CompoundTag tag = customData.copyTag();
+            CompoundTag tag = stack.getOrDefault(CrazyDataComponents.BUILDER_PROGRAM_DATA.get(), new CompoundTag()).copy();
 
             if (!tag.contains("program_id")) {
                 tag.putString("program_id", UUID.randomUUID().toString());
@@ -308,7 +298,7 @@ public class BuilderPatternItem extends AEBaseItem implements IMenuItem {
 
             tag.putBoolean("code", true);
 
-            stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+            stack.set(CrazyDataComponents.BUILDER_PROGRAM_DATA.get(), tag);
 
             if (player != null) player.displayClientMessage(Component.literal(okMsg), true);
         } catch (Exception e) {
@@ -440,8 +430,7 @@ public class BuilderPatternItem extends AEBaseItem implements IMenuItem {
         String outBody = rotateBodyInPlace(body, times);
         String updated = (header.isEmpty() ? "" : header + SEP) + outBody;
 
-        CustomData customData = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
-        CompoundTag tag = customData.copyTag();
+        CompoundTag tag = stack.getOrDefault(CrazyDataComponents.BUILDER_PROGRAM_DATA.get(), new CompoundTag()).copy();
 
         if (!tag.contains("program_id")) {
             tag.putString("program_id", UUID.randomUUID().toString());
@@ -455,7 +444,7 @@ public class BuilderPatternItem extends AEBaseItem implements IMenuItem {
 
             tag.putBoolean("code", true);
 
-            stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+            stack.set(CrazyDataComponents.BUILDER_PROGRAM_DATA.get(), tag);
         } catch (IOException ignored) {}
     }
 

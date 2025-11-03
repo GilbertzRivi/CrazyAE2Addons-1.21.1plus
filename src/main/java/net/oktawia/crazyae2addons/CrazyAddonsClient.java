@@ -9,8 +9,7 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
-import net.oktawia.crazyae2addons.renderer.GadgetCostPreviewClient;
-import net.oktawia.crazyae2addons.renderer.PreviewTooltipRenderer;
+import net.oktawia.crazyae2addons.renderer.Nokia3310CostPreviewClient;
 import net.oktawia.crazyae2addons.renderer.preview.AutoBuilderPreviewRenderer;
 import net.oktawia.crazyae2addons.renderer.preview.HeldStructureGadgetPreviewRenderer;
 
@@ -26,6 +25,6 @@ public class CrazyAddonsClient {
         CrazyAddons.LOGGER.info("CrazyAE2Addons loading on client...");
         NeoForge.EVENT_BUS.register(AutoBuilderPreviewRenderer.class);
         NeoForge.EVENT_BUS.register(HeldStructureGadgetPreviewRenderer.class);
-        NeoForge.EVENT_BUS.register(GadgetCostPreviewClient.class);
+        NeoForge.EVENT_BUS.register(Nokia3310CostPreviewClient.class);
     }
 }

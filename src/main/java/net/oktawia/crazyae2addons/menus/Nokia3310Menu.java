@@ -14,7 +14,7 @@ import net.oktawia.crazyae2addons.defs.regs.CrazyMenuRegistrar;
 import net.oktawia.crazyae2addons.items.BuilderPatternItem;
 import net.oktawia.crazyae2addons.items.Nokia3310;
 import net.oktawia.crazyae2addons.logic.BuilderPatternHost;
-import net.oktawia.crazyae2addons.logic.GadgetHost;
+import net.oktawia.crazyae2addons.logic.Nokia3310Host;
 import net.oktawia.crazyae2addons.network.SendLongStringToClientPacket;
 import net.oktawia.crazyae2addons.network.SendLongStringToServerPacket;
 
@@ -31,12 +31,12 @@ public class Nokia3310Menu extends AEBaseMenu {
     @GuiSync(7)
     public String program = "";
 
-    public GadgetHost host;
+    public Nokia3310Host host;
 
     @GuiSync(239)
     public String name = "";
 
-    public Nokia3310Menu(int id, Inventory playerInventory, GadgetHost host) {
+    public Nokia3310Menu(int id, Inventory playerInventory, Nokia3310Host host) {
         super(CrazyMenuRegistrar.NOKIA3310_MENU.get(), id, playerInventory, host);
         IUpgradeInventory upgrades = UpgradeInventories.forItem(host.getItemStack(), 4);
         for (int i = 0; i < upgrades.size(); i++) {

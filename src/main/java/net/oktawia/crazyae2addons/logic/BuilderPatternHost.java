@@ -3,17 +3,20 @@ package net.oktawia.crazyae2addons.logic;
 import appeng.api.implementations.menuobjects.ItemMenuHost;
 import appeng.menu.locator.ItemMenuHostLocator;
 import com.mojang.logging.LogUtils;
-import net.minecraft.core.component.DataComponents; // <-- NOWY IMPORT
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.CustomData; // <-- NOWY IMPORT
 import net.minecraft.world.level.storage.LevelResource;
-// Ta klasa nie była używana, usunąłem import
-// import net.oktawia.crazyae2addons.menus.CrazyEmitterMultiplierMenu;
+// --- USUNIĘTE IMPORTY (już niepotrzebne) ---
+// import net.minecraft.core.component.DataComponents;
+// import net.minecraft.world.item.component.CustomData;
+// import java.util.function.Consumer;
+// --- NOWE IMPORTY ---
+import net.oktawia.crazyae2addons.defs.regs.CrazyDataComponents;
 import net.oktawia.crazyae2addons.items.BuilderPatternItem;
 import net.oktawia.crazyae2addons.misc.ProgramExpander;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -21,7 +24,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
-import java.util.function.Consumer; // <-- NOWY IMPORT
 
 public class BuilderPatternHost extends ItemMenuHost<BuilderPatternItem> {
 
@@ -31,14 +33,12 @@ public class BuilderPatternHost extends ItemMenuHost<BuilderPatternItem> {
     public BuilderPatternHost(BuilderPatternItem item, Player player, ItemMenuHostLocator locator) {
         super(item, player, locator);
 
-        CompoundTag tag = this.getCustomTag();
-        if (tag != null) {
-            if (tag.contains("code")) {
-                this.code = tag.getBoolean("code");
-            }
-            if (tag.contains("delay")) {
-                this.delay = tag.getInt("delay");
-            }
+        CompoundTag tag = this.getProgramDataTag();
+        if (tag.contains("code")) {
+            this.code = tag.getBoolean("code");
+        }
+        if (tag.contains("delay")) {
+            this.delay = tag.getInt("delay");
         }
     }
 
@@ -54,8 +54,7 @@ public class BuilderPatternHost extends ItemMenuHost<BuilderPatternItem> {
         ProgramExpander.Result result = ProgramExpander.expand(program);
         this.code = result.success;
 
-        CustomData customData = this.getItemStack().getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
-        CompoundTag tag = customData.copyTag();
+        CompoundTag tag = getProgramDataTag();
 
         tag.putBoolean("code", this.code);
         String programId = null;
@@ -66,7 +65,7 @@ public class BuilderPatternHost extends ItemMenuHost<BuilderPatternItem> {
             programId = tag.getString("program_id");
         }
 
-        this.getItemStack().set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+        setProgramDataTag(tag);
 
         if (result.success) {
             saveProgramToFile(
@@ -79,17 +78,18 @@ public class BuilderPatternHost extends ItemMenuHost<BuilderPatternItem> {
 
     public void setDelay(int delay) {
         this.delay = delay;
-        updateCustomTag(tag -> tag.putInt("delay", delay));
+        CompoundTag tag = getProgramDataTag();
+        tag.putInt("delay", delay);
+        setProgramDataTag(tag);
     }
 
     public static String loadProgramFromFile(ItemStack stack, MinecraftServer server) {
         try {
             if (server == null || stack == null || stack.isEmpty()) return "";
 
-            CustomData customData = stack.get(DataComponents.CUSTOM_DATA);
-            if (customData == null) return "";
+            CompoundTag tag = stack.get(CrazyDataComponents.BUILDER_PROGRAM_DATA.get());
 
-            CompoundTag tag = customData.copyTag();
+            if (tag == null) return "";
 
             if (!tag.getBoolean("code") || !tag.contains("program_id")) return "";
             String id = tag.getString("program_id");
@@ -118,16 +118,14 @@ public class BuilderPatternHost extends ItemMenuHost<BuilderPatternItem> {
         }
     }
 
-    @Nullable
-    private CompoundTag getCustomTag() {
-        CustomData customData = this.getItemStack().get(DataComponents.CUSTOM_DATA);
-        return (customData != null) ? customData.copyTag() : null;
+
+    @NotNull
+    private CompoundTag getProgramDataTag() {
+        CompoundTag tag = this.getItemStack().getOrDefault(CrazyDataComponents.BUILDER_PROGRAM_DATA.get(), new CompoundTag());
+        return tag.copy();
     }
 
-    private void updateCustomTag(Consumer<CompoundTag> tagConsumer) {
-        CustomData customData = this.getItemStack().getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
-        CompoundTag tag = customData.copyTag();
-        tagConsumer.accept(tag);
-        this.getItemStack().set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+    private void setProgramDataTag(CompoundTag tag) {
+        this.getItemStack().set(CrazyDataComponents.BUILDER_PROGRAM_DATA.get(), tag);
     }
 }

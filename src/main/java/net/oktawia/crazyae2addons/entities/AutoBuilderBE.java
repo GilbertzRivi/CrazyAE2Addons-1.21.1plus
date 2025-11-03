@@ -75,10 +75,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 
 import net.oktawia.crazyae2addons.CrazyConfig;
 import net.oktawia.crazyae2addons.Utils;
-import net.oktawia.crazyae2addons.defs.regs.CrazyBlockEntityRegistrar;
-import net.oktawia.crazyae2addons.defs.regs.CrazyBlockRegistrar;
-import net.oktawia.crazyae2addons.defs.regs.CrazyItemRegistrar;
-import net.oktawia.crazyae2addons.defs.regs.CrazyMenuRegistrar;
+import net.oktawia.crazyae2addons.defs.regs.*;
 import net.oktawia.crazyae2addons.menus.AutoBuilderMenu;
 import net.oktawia.crazyae2addons.misc.ProgramExpander;
 import net.oktawia.crazyae2addons.renderer.preview.PreviewInfo;
@@ -143,7 +140,7 @@ public class AutoBuilderBE extends AENetworkedInvBlockEntity implements IGridTic
         this.inventory.setFilter(new IAEItemFilter() {
             @Override
             public boolean allowInsert(InternalInventory inv, int slot, ItemStack stack) {
-                return stack.getItem().equals(CrazyItemRegistrar.BUILDER_PATTERN.get().asItem());
+                return stack.getItem().equals(CrazyItemRegistrar.BUILDER_PATTERN.get().asItem()) && slot == 0;
             }
         });
     }
@@ -669,7 +666,7 @@ public class AutoBuilderBE extends AENetworkedInvBlockEntity implements IGridTic
                         }
                     }
 
-                    if (didDestroy) {
+                    if (didDestroy && CrazyConfig.COMMON.AutobuilderMineDelay.get() != 0) {
                         currentInstruction++;
                         tickDelayLeft = Math.max(tickDelayLeft, CrazyConfig.COMMON.AutobuilderMineDelay.get());
                         return TickRateModulation.URGENT;
@@ -952,10 +949,9 @@ public class AutoBuilderBE extends AENetworkedInvBlockEntity implements IGridTic
     public static String loadProgramFromFile(ItemStack stack, MinecraftServer server) {
         if (server == null) return "";
 
-        var custom = stack.get(DataComponents.CUSTOM_DATA);
-        if (custom == null) return "";
+        CompoundTag tag = stack.get(CrazyDataComponents.BUILDER_PROGRAM_DATA.get());
+        if (tag == null) return "";
 
-        CompoundTag tag = custom.copyTag();
         if (!tag.contains("program_id")) return "";
 
         String id = tag.getString("program_id");
@@ -981,11 +977,7 @@ public class AutoBuilderBE extends AENetworkedInvBlockEntity implements IGridTic
             return;
         }
 
-        CompoundTag tag = null;
-        var custom = s.get(DataComponents.CUSTOM_DATA);
-        if (custom != null) {
-            tag = custom.copyTag();
-        }
+        CompoundTag tag = s.get(CrazyDataComponents.BUILDER_PROGRAM_DATA.get());
 
         if (tag != null) {
             if (tag.contains("code") && tag.getBoolean("code")) {

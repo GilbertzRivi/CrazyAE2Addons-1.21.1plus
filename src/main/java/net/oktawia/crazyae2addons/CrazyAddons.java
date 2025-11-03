@@ -48,6 +48,7 @@ public class CrazyAddons {
         CrazyBlockRegistrar.register(modEventBus);
         CrazyBlockEntityRegistrar.register(modEventBus);
         CrazyMenuRegistrar.register(modEventBus);
+        CrazyDataComponents.register(modEventBus);
 
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(Screens::register);
@@ -110,6 +111,11 @@ public class CrazyAddons {
                 Capabilities.EnergyStorage.ITEM,
                 (stack, context) -> new Nokia3310.ItemEnergyStorage(stack),
                 CrazyItemRegistrar.NOKIA_3310.get()
+        );
+        event.registerBlockEntity(
+                Capabilities.ItemHandler.BLOCK,
+                CrazyBlockEntityRegistrar.AUTO_BUILDER_BE.get(),
+                (autoBuilderBE, context) -> autoBuilderBE.itemHandler
         );
 
 //        var partEvent = new RegisterPartCapabilitiesEvent();

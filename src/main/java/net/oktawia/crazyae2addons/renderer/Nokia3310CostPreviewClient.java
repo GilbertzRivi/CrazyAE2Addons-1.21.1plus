@@ -1,20 +1,19 @@
 package net.oktawia.crazyae2addons.renderer;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponents; // <-- NOWY IMPORT
-import net.minecraft.nbt.CompoundTag; // <-- NOWY IMPORT
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.oktawia.crazyae2addons.defs.regs.CrazyDataComponents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.CustomData; // <-- NOWY IMPORT
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.oktawia.crazyae2addons.items.Nokia3310; // <-- ZMIENIONA NAZWA
 
-public class GadgetCostPreviewClient {
+import net.oktawia.crazyae2addons.items.Nokia3310;
+
+public class Nokia3310CostPreviewClient {
 
     private static final int RED = 0xFF4040;
     private static final long TOOLTIP_TTL_MS = 175L;
@@ -39,12 +38,14 @@ public class GadgetCostPreviewClient {
         BlockPos lookAt = bhr.getBlockPos();
         Direction face = bhr.getDirection();
 
-        int energy = readEnergyFromNBT(held);
+        CompoundTag tag = held.get(CrazyDataComponents.BUILDER_PROGRAM_DATA.get());
+        if (tag == null) {
+            tag = new CompoundTag();
+        }
 
-        CustomData customData = held.get(DataComponents.CUSTOM_DATA);
-        CompoundTag tag = (customData != null) ? customData.copyTag() : null;
-        
-        if (tag != null && tag.contains("selA")) {
+        int energy = readEnergyFromNBT(tag);
+
+        if (tag.contains("selA")) {
             int[] a = tag.getIntArray("selA");
             if (a.length == 3) {
                 BlockPos cornerA = new BlockPos(a[0], a[1], a[2]);
@@ -55,7 +56,7 @@ public class GadgetCostPreviewClient {
             }
         }
 
-        if (tag != null && tag.getBoolean("code")) {
+        if (tag.getBoolean("code")) {
             BlockPos originWorld = lookAt.relative(face);
             Direction pasteFacing = player.getDirection();
             Nokia3310.Basis basis = Nokia3310.Basis.forFacing(pasteFacing);
@@ -78,9 +79,7 @@ public class GadgetCostPreviewClient {
         PreviewTooltipRenderer.set(msg, color, TOOLTIP_TTL_MS);
     }
 
-    private static int readEnergyFromNBT(ItemStack stack) {
-        CustomData customData = stack.get(DataComponents.CUSTOM_DATA);
-        if (customData == null) return 0;
-        return customData.copyTag().getInt("energy");
+    private static int readEnergyFromNBT(CompoundTag tag) {
+        return tag.getInt("energy");
     }
 }

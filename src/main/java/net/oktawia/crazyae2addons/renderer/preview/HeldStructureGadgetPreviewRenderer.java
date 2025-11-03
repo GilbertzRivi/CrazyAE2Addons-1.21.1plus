@@ -5,25 +5,26 @@ import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponents; // <-- NOWY IMPORT
+// --- USUNIĘTE IMPORTY ---
+// import net.minecraft.core.component.DataComponents;
+// import net.minecraft.world.item.component.CustomData;
+// --- NOWE IMPORTY ---
+import net.oktawia.crazyae2addons.defs.regs.CrazyDataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.CustomData; // <-- NOWY IMPORT
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
-// --- POPRAWIONE IMPORTY EVENTÓW ---
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
-// --- KONIEC POPRAWEK ---
 
 import net.oktawia.crazyae2addons.CrazyAddons;
-import net.oktawia.crazyae2addons.items.Nokia3310; // <-- ZMIENIONA NAZWA
+import net.oktawia.crazyae2addons.items.Nokia3310; // Zmieniono z StructureGadgetItem
 import net.oktawia.crazyae2addons.renderer.BuilderPreviewRenderer;
 
 import java.util.ArrayList;
@@ -41,10 +42,8 @@ public class HeldStructureGadgetPreviewRenderer {
         ItemStack held = mc.player.getMainHandItem();
         if (!(held.getItem() instanceof Nokia3310)) return;
 
-        CustomData customData = held.get(DataComponents.CUSTOM_DATA);
-        if (customData == null) return;
-        CompoundTag tag = customData.copyTag();
-        
+        CompoundTag tag = held.get(CrazyDataComponents.BUILDER_PROGRAM_DATA.get());
+        if (tag == null) return;
         if (!tag.getBoolean("code")) return;
 
         HitResult hr = mc.hitResult;
@@ -81,7 +80,7 @@ public class HeldStructureGadgetPreviewRenderer {
             if (palIndex < 0 || palIndex >= palList.size()) continue;
             String key = palList.getString(palIndex);
 
-            BlockState state = AutoBuilderPreviewStateCache.parseBlockState(key); 
+            BlockState state = AutoBuilderPreviewStateCache.parseBlockState(key);
             if (state == null) continue;
 
             if (steps != 0) {

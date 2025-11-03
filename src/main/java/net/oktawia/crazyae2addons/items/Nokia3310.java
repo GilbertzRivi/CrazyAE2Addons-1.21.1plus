@@ -13,7 +13,8 @@ import appeng.menu.locator.ItemMenuHostLocator;
 import appeng.menu.locator.MenuLocators;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponents;
+import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.oktawia.crazyae2addons.defs.regs.CrazyDataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -28,7 +29,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -38,12 +38,11 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.oktawia.crazyae2addons.CrazyConfig;
 import net.oktawia.crazyae2addons.defs.regs.CrazyMenuRegistrar;
 import net.oktawia.crazyae2addons.logic.BuildScheduler;
 import net.oktawia.crazyae2addons.logic.BuilderPatternHost;
-import net.oktawia.crazyae2addons.logic.GadgetHost;
+import net.oktawia.crazyae2addons.logic.Nokia3310Host;
 import net.oktawia.crazyae2addons.misc.ProgramExpander;
 import net.oktawia.crazyae2addons.recipes.StructureSnapshot;
 import org.jetbrains.annotations.NotNull;
@@ -55,6 +54,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors; // <-- NOWY IMPORT
 
 public class Nokia3310 extends AEBaseItem implements IMenuItem {
 
@@ -73,25 +73,22 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
 
     private static final String SEP = "|";
 
-    // --- POPRAWIONY KONSTRUKTOR ---
     public Nokia3310(Properties props) {
-        super(props.stacksTo(1));
+        super(props);
     }
 
-    // --- METODY POMOCNICZE DLA KOMPONENTÓW ---
     @Nullable
     private static CompoundTag getCustomTag(ItemStack stack) {
-        CustomData data = stack.get(DataComponents.CUSTOM_DATA);
-        return (data != null) ? data.copyTag() : null;
+        return stack.get(CrazyDataComponents.BUILDER_PROGRAM_DATA.get());
     }
 
     @NotNull
     private static CompoundTag getOrCreateCustomTag(ItemStack stack) {
-        return stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+        return stack.getOrDefault(CrazyDataComponents.BUILDER_PROGRAM_DATA.get(), new CompoundTag()).copy();
     }
 
     private static void setCustomTag(ItemStack stack, CompoundTag tag) {
-        stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+        stack.set(CrazyDataComponents.BUILDER_PROGRAM_DATA.get(), tag);
     }
 
     private static void updateCustomTag(ItemStack stack, Consumer<CompoundTag> tagConsumer) {
@@ -99,118 +96,17 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
         tagConsumer.accept(tag);
         setCustomTag(stack, tag);
     }
-    // --- KONIEC METOD POMOCNICZYCH ---
 
 
     public static boolean hasStoredStructure(ItemStack stack) {
         if (stack == null || stack.isEmpty()) return false;
-        CompoundTag tag = getCustomTag(stack); // POPRAWKA
+        CompoundTag tag = getCustomTag(stack);
         if (tag == null) return false;
         if (!tag.getBoolean("code")) return false;
         if (!tag.contains("program_id")) return false;
         String id = tag.getString("program_id");
-        return id != null && !id.isEmpty();
+        return !id.isEmpty();
     }
-
-    @Nullable
-    public static String getProgramIdOrNull(ItemStack stack) {
-        if (!hasStoredStructure(stack)) return null;
-        CompoundTag tag = getCustomTag(stack); // POPRAWKA
-        return (tag != null) ? tag.getString("program_id") : null;
-    }
-
-    public static @Nullable StructureSnapshot loadSnapshot(ItemStack stack, @Nullable Level level) {
-        if (stack == null || stack.isEmpty()) return null;
-        CompoundTag tag = getCustomTag(stack); // POPRAWKA
-        if (tag == null) return null;
-
-        if (!tag.contains("preview_palette") || !tag.contains("preview_positions") || !tag.contains("preview_indices"))
-            return null;
-
-        var palList = tag.getList("preview_palette", Tag.TAG_STRING);
-        if (palList.isEmpty()) return null;
-
-        List<BlockState> palette = new ArrayList<>(palList.size());
-        for (int i = 0; i < palList.size(); i++) {
-            String spec = palList.getString(i);
-            BlockState st = parseBlockStateSpecForSnapshot(spec);
-            if (st == null) return null;
-            palette.add(st);
-        }
-
-        int[] posArr = tag.getIntArray("preview_positions");
-        int[] idxArr = tag.getIntArray("preview_indices");
-        if (posArr.length == 0 || posArr.length % 3 != 0) return null;
-        int blocksN = posArr.length / 3;
-        if (idxArr.length != blocksN) return null;
-
-        // ... (reszta logiki bez zmian) ...
-        int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
-        int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
-        for (int i = 0; i < blocksN; i++) {
-            int x = posArr[i * 3];
-            int y = posArr[i * 3 + 1];
-            int z = posArr[i * 3 + 2];
-            if (x < minX) minX = x; if (x > maxX) maxX = x;
-            if (y < minY) minY = y; if (y > maxY) maxY = y;
-            if (z < minZ) minZ = z; if (z > maxZ) maxZ = z;
-        }
-
-        int sizeX = (maxX - minX) + 1;
-        int sizeY = (maxY - minY) + 1;
-        int sizeZ = (maxZ - minZ) + 1;
-
-        Map<BlockPos, BlockState> map = new HashMap<>(blocksN * 2);
-        for (int i = 0; i < blocksN; i++) {
-            int lx = posArr[i * 3]     - minX;
-            int ly = posArr[i * 3 + 1] - minY;
-            int lz = posArr[i * 3 + 2] - minZ;
-
-            int palIndex = idxArr[i];
-            if (palIndex < 0 || palIndex >= palette.size()) continue;
-            map.put(new BlockPos(lx, ly, lz), palette.get(palIndex));
-        }
-
-        return new StructureSnapshot(sizeX, sizeY, sizeZ, map);
-    }
-
-    private static @Nullable BlockState parseBlockStateSpecForSnapshot(String spec) {
-        // ... (logika parsowania bez zmian) ...
-        String name = spec;
-        String props = null;
-        int br = spec.indexOf('[');
-        if (br >= 0 && spec.endsWith("]")) {
-            name = spec.substring(0, br);
-            props = spec.substring(br + 1, spec.length() - 1);
-        }
-        ResourceLocation rl = ResourceLocation.tryParse(name);
-        if (rl == null) return null;
-
-        // --- POPRAWKA REJESTRU ---
-        var block = BuiltInRegistries.BLOCK.get(rl);
-        if (block == null) return null;
-
-        BlockState state = block.defaultBlockState();
-        if (props == null || props.isEmpty()) return state;
-
-        StateDefinition<?, ?> def = block.getStateDefinition();
-        String[] pairs = props.split(",");
-        for (String pair : pairs) {
-            String[] kv = pair.split("=", 2);
-            if (kv.length != 2) continue;
-            String key = kv[0].trim();
-            String val = kv[1].trim();
-            Property<?> prop = def.getProperty(key);
-            if (prop == null) continue;
-
-            Optional<?> parsed = ((Property) prop).getValue(val);
-            if (parsed.isPresent()) {
-                state = setUnchecked(state, prop, (Comparable) parsed.get());
-            }
-        }
-        return state;
-    }
-
 
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player p, @NotNull InteractionHand hand) {
@@ -254,32 +150,24 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
             return InteractionResult.SUCCESS;
         }
 
-        // --- POPRAWKA NBT ---
         CompoundTag tag = getCustomTag(stack);
         if (tag != null && tag.getBoolean("code")) {
-            // --- KONIEC POPRAWKI ---
             player.displayClientMessage(Component.literal("Paste current structure first"), true);
         } else if (cornerA == null) {
             cornerA = clicked.immutable();
-            // --- POPRAWKA NBT ---
             updateCustomTag(stack, t -> t.putIntArray("selA", new int[]{cornerA.getX(), cornerA.getY(), cornerA.getZ()}));
-            // --- KONIEC POPRAWKI ---
             player.displayClientMessage(Component.literal("Corner 1 set!"), true);
         } else if (cornerB == null) {
             cornerB = clicked.immutable();
             origin = clicked.immutable();
             originFacing = player.getDirection();
-            // --- POPRAWKA NBT ---
             updateCustomTag(stack, t -> t.remove("selA"));
-            // --- KONIEC POPRAWKI ---
             player.displayClientMessage(Component.literal("Corner 2 set! (origin)"), true);
         } else {
             cornerA = clicked.immutable();
             cornerB = null;
             origin = null;
-            // --- POPRAWKA NBT ---
             updateCustomTag(stack, t -> t.putIntArray("selA", new int[]{cornerA.getX(), cornerA.getY(), cornerA.getZ()}));
-            // --- KONIEC POPRAWKI ---
             player.displayClientMessage(Component.literal("Corner 1 set! (reset)"), true);
         }
         return InteractionResult.SUCCESS;
@@ -288,20 +176,18 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
 
     @Override
     public @Nullable ItemMenuHost<?> getMenuHost(Player player, ItemMenuHostLocator locator, @Nullable BlockHitResult hitResult) {
-        return new GadgetHost(this, player, locator);
+        return new Nokia3310Host(this, player, locator);
     }
 
     private static int getEnergy(ItemStack stack) {
-        CompoundTag tag = getCustomTag(stack); // POPRAWKA
+        CompoundTag tag = getCustomTag(stack);
         return (tag != null) ? tag.getInt(NBT_ENERGY) : 0;
     }
 
     private static void setEnergy(ItemStack stack, int value) {
         int cap = getMaxEnergyCapacity(stack);
         int finalValue = Math.max(0, Math.min(cap, value));
-        // --- POPRAWKA NBT ---
         updateCustomTag(stack, tag -> tag.putInt(NBT_ENERGY, finalValue));
-        // --- KONIEC POPRAWKI ---
     }
 
     public IUpgradeInventory getUpgrades(ItemStack stack) {
@@ -353,7 +239,7 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
         IUpgradeInventory inv = UpgradeInventories.forItem(stack, ENERGY_CARD_SLOTS);
         int cards = inv.getInstalledUpgrades(AEItems.ENERGY_CARD);
         tooltip.add(Component.literal("Energy Cards: " + cards + " / " + ENERGY_CARD_SLOTS));
-        super.appendHoverText(stack, context, tooltip, flag); // Poprawka na context
+        super.appendHoverText(stack, context, tooltip, flag);
     }
 
     @Override
@@ -399,8 +285,6 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
     }
 
     public static int computeCutCostFE(Level level, BlockPos cornerA, BlockPos cornerB, BlockPos origin) {
-        if (level == null || cornerA == null || cornerB == null || origin == null) return 0;
-        // ... (logika min/max bez zmian) ...
         BlockPos min = new BlockPos(
                 Math.min(cornerA.getX(), cornerB.getX()),
                 Math.min(cornerA.getY(), cornerB.getY()),
@@ -419,10 +303,6 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
                     BlockPos wp = new BlockPos(x, y, z);
                     BlockState state = level.getBlockState(wp);
                     if (state.isAir()) continue;
-
-                    // --- POPRAWKA REJESTRU ---
-                    var id = BuiltInRegistries.BLOCK.getKey(state.getBlock());
-                    if (id == null) continue;
 
                     var itemKey = AEItemKey.of(state.getBlock().asItem());
                     if (itemKey.fuzzyEquals(AEItemKey.of(Blocks.AIR.asItem()), FuzzyMode.IGNORE_ALL)) continue;
@@ -435,10 +315,8 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
     }
 
     private void generateProgramAndCut(Level level, Player p, ItemStack stack) {
-        // --- POPRAWKA NBT ---
         CompoundTag currentTag = getCustomTag(stack);
         if (currentTag != null && currentTag.getBoolean("code")) {
-            // --- KONIEC POPRAWKI ---
             p.displayClientMessage(Component.literal("Paste current structure first"), true);
             return;
         }
@@ -447,7 +325,6 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
             return;
         }
 
-        // ... (logika min/max bez zmian) ...
         BlockPos min = new BlockPos(
                 Math.min(cornerA.getX(), cornerB.getX()),
                 Math.min(cornerA.getY(), cornerB.getY()),
@@ -467,9 +344,7 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
                     BlockState state = level.getBlockState(wp);
                     if (state.isAir()) continue;
 
-                    // --- POPRAWKA REJESTRU ---
                     ResourceLocation blockIdRL = BuiltInRegistries.BLOCK.getKey(state.getBlock());
-                    if (blockIdRL == null) continue;
 
                     var itemKey = AEItemKey.of(state.getBlock().asItem());
                     if (itemKey.fuzzyEquals(AEItemKey.of(Blocks.AIR.asItem()), FuzzyMode.IGNORE_ALL)) continue;
@@ -504,24 +379,18 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
                     BlockState state = level.getBlockState(wp);
                     if (state.isAir()) continue;
 
-                    // --- POPRAWKA REJESTRU ---
                     ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(state.getBlock());
-                    if (blockId == null) continue;
 
                     var itemKey = AEItemKey.of(state.getBlock().asItem());
                     if (itemKey.fuzzyEquals(AEItemKey.of(Blocks.AIR.asItem()), FuzzyMode.IGNORE_ALL)) continue;
 
-                    // ... (logika budowania stringa bez zmian) ...
+                    String properties = state.getValues().entrySet().stream()
+                            .map(entry -> entry.getKey().getName() + "=" + entry.getValue().toString())
+                            .collect(Collectors.joining(","));
+
                     StringBuilder fullId = new StringBuilder(blockId.toString());
-                    if (!state.getValues().isEmpty()) {
-                        fullId.append("[");
-                        boolean first = true;
-                        for (Map.Entry<Property<?>, Comparable<?>> e : state.getValues().entrySet()) {
-                            if (!first) fullId.append(",");
-                            fullId.append(e.getKey().getName()).append("=").append(e.getValue());
-                            first = false;
-                        }
-                        fullId.append("]");
+                    if (!properties.isEmpty()) {
+                        fullId.append("[").append(properties).append("]");
                     }
 
                     String key = fullId.toString();
@@ -545,13 +414,11 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
                 }
             }
         }
-        // ... (logika budowania nagłówka bez zmian) ...
         StringBuilder header = new StringBuilder();
         for (Map.Entry<String, Integer> e : blockMap.entrySet()) {
             header.append(e.getValue()).append("(").append(e.getKey()).append("),\n");
         }
         if (!header.isEmpty()) header.setLength(header.length() - 2);
-
         String finalCode = header + "\n" + SEP + SEP + "\n" + pattern;
 
         ProgramExpander.Result result = ProgramExpander.expand(finalCode);
@@ -570,9 +437,7 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
                     4,
                     cutOps,
                     () -> {
-                        // dopiero TERAZ zapisujemy program do NBT
                         String programId = UUID.randomUUID().toString();
-                        // --- POPRAWKA NBT ---
                         updateCustomTag(stack, tag -> {
                             tag.putBoolean("code", true);
                             tag.putString("program_id", programId);
@@ -597,7 +462,6 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
                             }
                             tag.putIntArray("preview_positions", posArr);
                         });
-                        // --- KONIEC POPRAWKI ---
 
                         saveProgramToFile(programId, finalCode, p.getServer());
                         p.displayClientMessage(Component.literal("CUT complete (" + finalCutCount + " blocks)"), true);
@@ -608,10 +472,8 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
     }
 
     private void pasteNow(Level level, Player p, ItemStack stack, BlockPos originWorld, Direction pasteFacing) {
-        // --- POPRAWKA NBT ---
         CompoundTag tag = getCustomTag(stack);
         if (tag == null || !tag.getBoolean("code")) {
-            // --- KONIEC POPRAWKI ---
             p.displayClientMessage(Component.literal("No stored structure"), true);
             return;
         }
@@ -621,7 +483,6 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
             p.displayClientMessage(Component.literal("No stored structure"), true);
             return;
         }
-        // ... (reszta logiki parsowania bez zmian) ...
         int i = full.lastIndexOf(SEP);
         final String header = i >= 0 ? full.substring(0, i) : "";
         final String body = i >= 0 ? full.substring(i + (SEP).length()) : full;
@@ -637,7 +498,6 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
         if (steps != 0) rotatePaletteInPlace(palette, steps);
 
         Basis basis = Basis.forFacing(pasteFacing);
-        // ... (logika sprawdzania kolizji bez zmian) ...
         {
             BlockPos cursor = BlockPos.ZERO;
             int idx = 0, n = body.length();
@@ -757,7 +617,6 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
 
 
     private static void clearStoredStructure(ItemStack stack, MinecraftServer server) {
-        // --- POPRAWKA NBT ---
         CompoundTag tag = getCustomTag(stack);
         if (tag == null) return;
 
@@ -805,7 +664,6 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
     }
 
     private BlockState parseBlockStateSpec(String spec) {
-        // ... (logika parsowania bez zmian) ...
         String name = spec;
         String props = null;
         int br = spec.indexOf('[');
@@ -816,7 +674,6 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
         ResourceLocation rl = ResourceLocation.tryParse(name);
         if (rl == null) return null;
 
-        // --- POPRAWKA REJESTRU ---
         var block = BuiltInRegistries.BLOCK.get(rl);
 
         BlockState state = block.defaultBlockState();
@@ -832,20 +689,15 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
             Property<?> prop = def.getProperty(key);
             if (prop == null) continue;
 
-            java.util.Optional<?> parsed = ((Property) prop).getValue(val);
+            Optional<?> parsed = prop.getValue(val);
             if (parsed.isPresent()) {
-                state = setUnchecked(state, prop, (Comparable) parsed.get());
+                state = setUnchecked(state, prop, (Comparable<?>) parsed.get());
             }
         }
         return state;
     }
 
-    private static BlockState setUnchecked(BlockState state, Property prop, Comparable value) {
-        return state.setValue(prop, value);
-    }
-
     private static void saveProgramToFile(String id, String code, MinecraftServer server) {
-        // ... (bez zmian)
         Path file = server.getWorldPath(new LevelResource("serverdata"))
                 .resolve("autobuilder")
                 .resolve(id);
@@ -856,19 +708,17 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
     }
 
     public record Basis(int fx, int fz, int rx, int rz) {
-
         public static Basis forFacing(Direction f) {
-                return switch (f) {
-                    case SOUTH -> new Basis(0, 1, -1, 0);
-                    case EAST -> new Basis(1, 0, 0, 1);
-                    case WEST -> new Basis(-1, 0, 0, -1);
-                    default -> new Basis(0, -1, 1, 0);
-                };
-            }
+            return switch (f) {
+                case SOUTH -> new Basis(0, 1, -1, 0);
+                case EAST -> new Basis(1, 0, 0, 1);
+                case WEST -> new Basis(-1, 0, 0, -1);
+                default -> new Basis(0, -1, 1, 0);
+            };
         }
+    }
 
     private static BlockPos worldToLocal(BlockPos worldPos, BlockPos origin, Basis b) {
-        // ... (bez zmian)
         int dx = worldPos.getX() - origin.getX();
         int dy = worldPos.getY() - origin.getY();
         int dz = worldPos.getZ() - origin.getZ();
@@ -881,7 +731,6 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
     }
 
     public static BlockPos localToWorld(BlockPos local, BlockPos origin, Basis b) {
-        // ... (bez zmian)
         int dx = local.getX() * b.rx + local.getZ() * b.fx;
         int dz = local.getX() * b.rz + local.getZ() * b.fz;
         int dy = local.getY();
@@ -889,7 +738,6 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
     }
 
     private static BlockPos stepCursor(BlockPos cursor, char ch) {
-        // ... (bez zmian)
         return switch (ch) {
             case 'F' -> cursor.offset(0, 0, 1);
             case 'B' -> cursor.offset(0, 0, -1);
@@ -902,7 +750,6 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
     }
 
     private static String moveCursorRelative(BlockPos fromLocal, BlockPos toLocal) {
-        // ... (bez zmian)
         StringBuilder moves = new StringBuilder();
         int dx = toLocal.getX() - fromLocal.getX();
         int dy = toLocal.getY() - fromLocal.getY();
@@ -919,10 +766,8 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
     }
 
     public static Direction readSrcFacingFromNbt(ItemStack stack) {
-        // --- POPRAWKA NBT ---
         CompoundTag tag = getCustomTag(stack);
         if (tag != null && tag.contains("src_facing")) {
-            // --- KONIEC POPRAWKI ---
             String s = tag.getString("src_facing");
             Direction d = Direction.byName(s);
             if (d != null && d.getAxis().isHorizontal()) return d;
@@ -931,7 +776,6 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
     }
 
     public static int rotationSteps(Direction source, Direction target) {
-        // ... (bez zmian)
         int a = switch (source) {
             case NORTH -> 0;
             case EAST  -> 1;
@@ -950,7 +794,6 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
     }
 
     private static void rotatePaletteInPlace(Map<Integer, BlockState> palette, int steps) {
-        // ... (bez zmian)
         net.minecraft.world.level.block.Rotation rot = switch (((steps % 4) + 4) % 4) {
             case 1 -> net.minecraft.world.level.block.Rotation.CLOCKWISE_90;
             case 2 -> net.minecraft.world.level.block.Rotation.CLOCKWISE_180;
@@ -1092,6 +935,10 @@ public class Nokia3310 extends AEBaseItem implements IMenuItem {
         tag.putIntArray("preview_positions", posArr);
 
         setCustomTag(stack, tag);
+    }
+
+    private static BlockState setUnchecked(BlockState state, Property prop, Comparable value) {
+        return state.setValue(prop, value);
     }
 
     public static class ItemEnergyStorage implements IEnergyStorage {
