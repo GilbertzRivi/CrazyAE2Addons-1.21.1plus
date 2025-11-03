@@ -8,6 +8,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.oktawia.crazyae2addons.CrazyAddons;
+import net.oktawia.crazyae2addons.entities.AmpereMeterBE;
 import net.oktawia.crazyae2addons.entities.AutoBuilderBE;
 import net.oktawia.crazyae2addons.entities.BrokenPatternProviderBE;
 import net.oktawia.crazyae2addons.entities.CrazyPatternProviderBE;
@@ -44,6 +45,9 @@ public class CrazyMenuRegistrar {
 
     public static final DeferredHolder<MenuType<?>, MenuType<Nokia3310Menu>> NOKIA3310_MENU =
             reg(id("nokia3310"), Nokia3310Menu::new, Nokia3310Host.class);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<AmpereMeterMenu>> AMPERE_METER_MENU =
+            reg(id("ampere_meter"), AmpereMeterMenu::new, AmpereMeterBE.class);
 
     public static void register(IEventBus eventBus) {
         MENU_TYPES.register(eventBus);

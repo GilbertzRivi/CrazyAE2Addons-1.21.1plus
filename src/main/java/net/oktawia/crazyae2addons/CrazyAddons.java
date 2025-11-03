@@ -5,12 +5,15 @@ import appeng.api.networking.IInWorldGridNodeHost;
 import appeng.api.parts.RegisterPartCapabilitiesEvent;
 import appeng.api.parts.RegisterPartCapabilitiesEventInternal;
 import appeng.core.definitions.AEBlockEntities;
+import com.gregtechceu.gtceu.api.capability.GTCapability;
+import net.minecraft.core.Direction;
 import net.neoforged.fml.ModLoader;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.oktawia.crazyae2addons.defs.Screens;
 import net.oktawia.crazyae2addons.defs.UpgradeCards;
 import net.oktawia.crazyae2addons.defs.regs.*;
+import net.oktawia.crazyae2addons.entities.AmpereMeterBE;
 import net.oktawia.crazyae2addons.items.Nokia3310;
 import net.oktawia.crazyae2addons.logic.BuildScheduler;
 import net.oktawia.crazyae2addons.network.SendLongStringToClientPacket;
@@ -116,6 +119,47 @@ public class CrazyAddons {
                 Capabilities.ItemHandler.BLOCK,
                 CrazyBlockEntityRegistrar.AUTO_BUILDER_BE.get(),
                 (autoBuilderBE, context) -> autoBuilderBE.itemHandler
+        );
+
+        event.registerBlockEntity(
+                Capabilities.EnergyStorage.BLOCK,
+                CrazyBlockEntityRegistrar.AMPERE_METER_BE.get(),
+                (be, context) -> {
+                    Direction inputSide = be.direction ? Utils.getRightDirection(be.getBlockState()) : Utils.getLeftDirection(be.getBlockState());
+                    Direction outputSide = !be.direction ? Utils.getRightDirection(be.getBlockState()) : Utils.getLeftDirection(be.getBlockState());
+                    if (context == null) return null;
+                    LOGGER.info("D");
+                    if (context == inputSide) {
+                        return be.feLogicInput;
+                    }
+                    if (context == outputSide) {
+                        return be.feLogicOutput;
+                    }
+                    return null;
+                }
+        );
+
+        event.registerBlockEntity(
+                Capabilities.EnergyStorage.BLOCK,
+                CrazyBlockEntityRegistrar.GT_AMPERE_METER_BE.get(),
+                (be, context) -> {
+                    Direction inputSide = be.direction ? Utils.getRightDirection(be.getBlockState()) : Utils.getLeftDirection(be.getBlockState());
+                    Direction outputSide = !be.direction ? Utils.getRightDirection(be.getBlockState()) : Utils.getLeftDirection(be.getBlockState());
+                    if (context == null) return null;
+                    if (context == inputSide) {
+                        return be.feLogicInput;
+                    }
+                    if (context == outputSide) {
+                        return be.feLogicOutput;
+                    }
+                    return null;
+                }
+        );
+
+        event.registerBlockEntity(
+                GTCapability.CAPABILITY_ENERGY_CONTAINER,
+                CrazyBlockEntityRegistrar.GT_AMPERE_METER_BE.get(),
+                (be, context) -> be.euLogic
         );
 
 //        var partEvent = new RegisterPartCapabilitiesEvent();

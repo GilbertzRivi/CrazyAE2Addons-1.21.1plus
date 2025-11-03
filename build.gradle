@@ -61,6 +61,7 @@ repositories {
         name 'Configuration (alternative/backup)'
         url 'https://api.repsy.io/mvn/toma/public/'
     }
+    maven { url 'https://modmaven.dev/' }
 }
 
 base {
@@ -131,8 +132,20 @@ dependencies {
     implementation "com.lowdragmc.ldlib:ldlib-neoforge-1.21.1:1.0.35.a"
     compileOnly "com.gregtechceu.gtceu:gtceu-1.21.1:7.1.0-SNAPSHOT"
     // OPTIONAL, FOR DEV
-    implementation "curse.maven:flux-networks-248020:6089446"
     implementation "com.gregtechceu.gtceu:gtceu-1.21.1:7.1.0-SNAPSHOT"
+
+    implementation "curse.maven:flux-networks-248020:6089446"
+    implementation "curse.maven:jade-324717:6853386"
+    implementation "curse.maven:jei-238222:7173821"
+
+    implementation "curse.maven:pipez-443900:5757713"
+
+    implementation "curse.maven:integrated-dynamics-236307:7102002"
+    implementation "curse.maven:integrated-tunnels-251389:7076261"
+    implementation "curse.maven:common-capabilities-247007:7117034"
+    implementation "curse.maven:cyclops-core-232758:7146694"
+
+    implementation "mekanism:Mekanism:1.21.1-10.7.9.72"
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {

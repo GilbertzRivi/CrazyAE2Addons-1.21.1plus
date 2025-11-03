@@ -40,5 +40,11 @@ public final class Screens {
                 Nokia3310Screen<Nokia3310Menu>::new,
                 "/screens/nokia3310.json"
         );
+        InitScreens.register(
+                event,
+                CrazyMenuRegistrar.AMPERE_METER_MENU.get(),
+                AmpereMeterScreen<AmpereMeterMenu>::new,
+                "/screens/ampere_meter.json"
+        );
     }
 }

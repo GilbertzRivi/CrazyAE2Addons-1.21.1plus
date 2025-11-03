@@ -31,7 +31,9 @@
       }
     },
     "info1": {
-      "text": "Pattern",
+      "text": {
+        "translate": "translatable.crazyae2addons.auto_builder.pattern"
+      },
       "position": {
         "left": 126,
         "top": 64
@@ -46,7 +48,9 @@
       "align": "CENTER"
     },
     "missing2": {
-      "text": "Missing:",
+      "text": {
+        "translate": "translatable.crazyae2addons.auto_builder.missing"
+      },
       "position": {
         "left": 88,
         "top": 16

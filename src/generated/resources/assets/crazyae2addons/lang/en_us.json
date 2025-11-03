@@ -1,4 +1,5 @@
 {
+    "block.crazyae2addons.ampere_meter": "Ampere Meter",
     "block.crazyae2addons.auto_builder": "Auto Builder",
     "block.crazyae2addons.auto_builder_creative_supply": "Auto Builder Creative Supply",
     "block.crazyae2addons.broken_pattern_provider": "Broken Pattern Provider",
@@ -6,5 +7,7 @@
     "creativetab.title": "Crazy AE2 Addons",
     "item.crazyae2addons.builder_pattern": "Builder Pattern",
     "item.crazyae2addons.crazy_pattern_provider_upgrade": "Crazy Pattern Provider Upgrade",
-    "item.crazyae2addons.nokia_3310": "Nokia 3310"
+    "item.crazyae2addons.nokia_3310": "Nokia 3310",
+    "translatable.crazyae2addons.auto_builder.missing": "Missing:",
+    "translatable.crazyae2addons.auto_builder.pattern": "Pattern"
 }

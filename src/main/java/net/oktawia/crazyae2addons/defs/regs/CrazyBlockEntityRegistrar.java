@@ -9,10 +9,8 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder; // <-- Zmiana z RegistryObject
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.oktawia.crazyae2addons.CrazyAddons;
-import net.oktawia.crazyae2addons.entities.AutoBuilderBE;
-import net.oktawia.crazyae2addons.entities.AutoBuilderCreativeSupplyBE;
-import net.oktawia.crazyae2addons.entities.BrokenPatternProviderBE;
-import net.oktawia.crazyae2addons.entities.CrazyPatternProviderBE;
+import net.oktawia.crazyae2addons.compat.GregTech.GTAmpereMeterBE;
+import net.oktawia.crazyae2addons.entities.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +50,12 @@ public class CrazyBlockEntityRegistrar {
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AutoBuilderCreativeSupplyBE>> AUTO_BUILDER_CREATIVE_SUPPLY_BE =
             reg("auto_builder_creative_supply", CrazyBlockRegistrar.AUTO_BUILDER_CREATIVE_SUPPLY_BLOCK, AutoBuilderCreativeSupplyBE::new, AutoBuilderCreativeSupplyBE.class);
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AmpereMeterBE>> AMPERE_METER_BE =
+            reg("ampere_meter", CrazyBlockRegistrar.AMPERE_METER_BLOCK, AmpereMeterBE::new, AmpereMeterBE.class);
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GTAmpereMeterBE>> GT_AMPERE_METER_BE =
+            reg("gt_ampere_meter", CrazyBlockRegistrar.AMPERE_METER_BLOCK, GTAmpereMeterBE::new, GTAmpereMeterBE.class);
 
     public static void runBlockEntitySetup() {
         BLOCK_ENTITY_SETUP.forEach(Runnable::run);

@@ -16,7 +16,7 @@ public class CrazyCreativeTabRegistrar {
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, CrazyAddons.MODID);
 
     public static final Supplier<CreativeModeTab> TAB = CREATIVE_MODE_TAB.register("crazy_tab",
-            () -> CreativeModeTab.builder().icon(() -> new ItemStack(Items.STICK.asItem()))
+            () -> CreativeModeTab.builder().icon(() -> new ItemStack(CrazyBlockRegistrar.CRAZY_PATTERN_PROVIDER_BLOCK.asItem()))
                     .title(Component.translatable("creativetab.title"))
                     .displayItems((itemDisplayParameters, output) -> {
                         for (var item : CrazyItemRegistrar.getItems()) {
