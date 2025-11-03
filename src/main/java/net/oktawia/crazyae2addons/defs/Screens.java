@@ -46,5 +46,17 @@ public final class Screens {
                 AmpereMeterScreen<AmpereMeterMenu>::new,
                 "/screens/ampere_meter.json"
         );
+        InitScreens.register(
+                event,
+                CrazyMenuRegistrar.DISPLAY_MENU.get(),
+                DisplayScreen<DisplayMenu>::new,
+                "/screens/display.json"
+        );
+        InitScreens.register(
+                event,
+                CrazyMenuRegistrar.ME_DATA_CONTROLLER_MENU.get(),
+                MEDataControllerScreen<MEDataControllerMenu>::new,
+                "/screens/data_controller.json"
+        );
     }
 }

@@ -14,6 +14,7 @@ import net.oktawia.crazyae2addons.CrazyAddons;
 import net.oktawia.crazyae2addons.items.BuilderPatternItem;
 import net.oktawia.crazyae2addons.items.CrazyPatternProviderUpgrade;
 import net.oktawia.crazyae2addons.items.Nokia3310;
+import net.oktawia.crazyae2addons.parts.DisplayPart;
 import net.oktawia.crazyae2addons.parts.WormholeP2PTunnelPart;
 
 import java.util.List;
@@ -61,6 +62,13 @@ public class CrazyItemRegistrar {
             "wormhole_p2p_tunnel",
             WormholeP2PTunnelPart.class,
             WormholeP2PTunnelPart::new
+    );
+
+    public static final ItemDefinition<PartItem<DisplayPart>> DISPLAY_PART = part(
+            "Display",
+            "display",
+            DisplayPart.class,
+            DisplayPart::new
     );
 
     public static <T extends IPart> ItemDefinition<PartItem<T>> part(

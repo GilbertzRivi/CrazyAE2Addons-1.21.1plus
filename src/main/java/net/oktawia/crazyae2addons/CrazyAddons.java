@@ -17,13 +17,10 @@ import net.oktawia.crazyae2addons.entities.AmpereMeterBE;
 import net.oktawia.crazyae2addons.items.Nokia3310;
 import net.oktawia.crazyae2addons.logic.BuildScheduler;
 import net.oktawia.crazyae2addons.misc.WormholeAnchor;
-import net.oktawia.crazyae2addons.network.SendLongStringToClientPacket;
-import net.oktawia.crazyae2addons.network.SendLongStringToServerPacket;
-import net.oktawia.crazyae2addons.network.SyncBlockClientPacket; // Zaimportuj swoje pakiety
+import net.oktawia.crazyae2addons.network.*;
 // Zaimportuj tutaj wszystkie swoje klasy pakietów
 // import net.oktawia.crazyae2addons.network.*;
 
-import net.oktawia.crazyae2addons.network.UpdatePatternsPacket;
 import net.oktawia.crazyae2addons.parts.WormholeP2PTunnelPart;
 import net.oktawia.crazyae2addons.renderer.PreviewTooltipRenderer;
 import org.slf4j.Logger;
@@ -99,6 +96,11 @@ public class CrazyAddons {
                 SendLongStringToServerPacket.TYPE,
                 SendLongStringToServerPacket.STREAM_CODEC,
                 SendLongStringToServerPacket::handle
+        );
+        registrar.playToClient(
+                DisplayValuePacket.TYPE,
+                DisplayValuePacket.STREAM_CODEC,
+                DisplayValuePacket::handle
         );
     }
 

@@ -1,0 +1,40 @@
+{
+  "$schema": "schema.json",
+  "includes": ["common/common.json", "common/player_inventory.json"],
+  "background": {
+    "texture": "guis/data_controller.png",
+    "srcRect": [0, 0, 176, 205]
+  },
+  "text": {
+    "dialog_title": {
+      "text": {
+        "translate": "block.crazyae2addons.data_controller"
+      },
+      "position": {
+        "left": 8,
+        "top": 6
+      }
+    },
+    "info1": {
+      "position": {
+        "top": 30,
+        "left": 88
+      },
+      "align": "CENTER"
+    },
+    "info2": {
+      "position": {
+        "top": 40,
+        "left": 88
+      },
+      "align": "CENTER"
+    }
+  },
+  "slots": {
+    "STORAGE": {
+      "left": 62,
+      "top": 59,
+      "grid": "BREAK_AFTER_3COLS"
+    }
+  }
+}

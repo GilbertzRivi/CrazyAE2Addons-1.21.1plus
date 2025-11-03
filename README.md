@@ -22,7 +22,7 @@
 - [ ] Entropy Cradle Capacitor
 - [ ] Entropy Cradle Controller
 - [ ] Impulsed Pattern Provider
-- [ ] Data Variables Controller
+- [x] Data Variables Controller
 - [ ] Mob Farm Collector
 - [ ] Mob Farm Controller
 - [ ] Mob Farm Damage
@@ -105,7 +105,7 @@
 ### PARTS 
 - [ ] Chunky Fluid P2P Tunnel
 - [ ] Data Extractor
-- [ ] Display
+- [x] Display
 - [ ] Energy Exporter
 - [ ] Energy Interface
 - [ ] Entity Ticker

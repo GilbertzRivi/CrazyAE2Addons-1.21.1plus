@@ -8,13 +8,11 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.oktawia.crazyae2addons.CrazyAddons;
-import net.oktawia.crazyae2addons.entities.AmpereMeterBE;
-import net.oktawia.crazyae2addons.entities.AutoBuilderBE;
-import net.oktawia.crazyae2addons.entities.BrokenPatternProviderBE;
-import net.oktawia.crazyae2addons.entities.CrazyPatternProviderBE;
+import net.oktawia.crazyae2addons.entities.*;
 import net.oktawia.crazyae2addons.logic.BuilderPatternHost;
 import net.oktawia.crazyae2addons.logic.Nokia3310Host;
 import net.oktawia.crazyae2addons.menus.*;
+import net.oktawia.crazyae2addons.parts.DisplayPart;
 
 
 public class CrazyMenuRegistrar {
@@ -48,6 +46,12 @@ public class CrazyMenuRegistrar {
 
     public static final DeferredHolder<MenuType<?>, MenuType<AmpereMeterMenu>> AMPERE_METER_MENU =
             reg(id("ampere_meter"), AmpereMeterMenu::new, AmpereMeterBE.class);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<DisplayMenu>> DISPLAY_MENU =
+            reg(id("display"), DisplayMenu::new, DisplayPart.class);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<MEDataControllerMenu>> ME_DATA_CONTROLLER_MENU =
+            reg(id("data_controller"), MEDataControllerMenu::new, DataControllerBE.class);
 
     public static void register(IEventBus eventBus) {
         MENU_TYPES.register(eventBus);

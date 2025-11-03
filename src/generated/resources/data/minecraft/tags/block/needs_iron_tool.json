@@ -4,6 +4,7 @@
         "crazyae2addons:broken_pattern_provider",
         "crazyae2addons:auto_builder",
         "crazyae2addons:auto_builder_creative_supply",
-        "crazyae2addons:ampere_meter"
+        "crazyae2addons:ampere_meter",
+        "crazyae2addons:data_controller"
     ]
 }

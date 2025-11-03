@@ -3,7 +3,6 @@ package net.oktawia.crazyae2addons.defs.regs;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -63,6 +62,9 @@ public class CrazyBlockRegistrar {
 
     public static final DeferredBlock<AmpereMeterBlock> AMPERE_METER_BLOCK = registerBlock(
             "ampere_meter", AmpereMeterBlock::new);
+
+    public static final DeferredBlock<DataControllerBlock> DATA_CONTROLLER_BLOCK = registerBlock(
+            "data_controller", DataControllerBlock::new);
 
     public static void register(IEventBus eventBus) {
         BLOCKS.register(eventBus);

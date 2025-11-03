@@ -57,6 +57,9 @@ public class CrazyBlockEntityRegistrar {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GTAmpereMeterBE>> GT_AMPERE_METER_BE =
             reg("gt_ampere_meter", CrazyBlockRegistrar.AMPERE_METER_BLOCK, GTAmpereMeterBE::new, GTAmpereMeterBE.class);
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<DataControllerBE>> DATA_CONTROLLER_BE =
+            reg("data_controller", CrazyBlockRegistrar.DATA_CONTROLLER_BLOCK, DataControllerBE::new, DataControllerBE.class);
+
     public static void runBlockEntitySetup() {
         BLOCK_ENTITY_SETUP.forEach(Runnable::run);
         BLOCK_ENTITY_SETUP.clear();

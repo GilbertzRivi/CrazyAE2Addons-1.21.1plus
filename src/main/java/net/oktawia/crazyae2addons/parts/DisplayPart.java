@@ -1,0 +1,829 @@
+package net.oktawia.crazyae2addons.parts;
+
+import java.security.SecureRandom;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import appeng.blockentity.networking.CableBusBlockEntity;
+import com.mojang.logging.LogUtils;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.math.Axis;
+
+import appeng.api.implementations.items.IMemoryCard;
+import appeng.api.networking.IGridNode;
+import appeng.api.networking.storage.IStorageService;
+import appeng.api.networking.ticking.IGridTickable;
+import appeng.api.networking.ticking.TickRateModulation;
+import appeng.api.networking.ticking.TickingRequest;
+import appeng.api.parts.IPartCollisionHelper;
+import appeng.api.parts.IPartItem;
+import appeng.api.parts.IPartModel;
+import appeng.api.stacks.AEFluidKey;
+import appeng.api.stacks.AEItemKey;
+import appeng.api.util.AECableType;
+import appeng.items.parts.PartModels;
+import appeng.menu.MenuOpener;
+import appeng.menu.locator.MenuLocators;
+import appeng.parts.AEBasePart;
+import appeng.parts.automation.PlaneModels;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.oktawia.crazyae2addons.defs.regs.CrazyMenuRegistrar;
+import net.oktawia.crazyae2addons.entities.DataControllerBE;
+import net.oktawia.crazyae2addons.interfaces.VariableMachine;
+import net.oktawia.crazyae2addons.menus.DisplayMenu;
+import net.oktawia.crazyae2addons.network.DisplayValuePacket;
+
+public class DisplayPart extends AEBasePart implements MenuProvider, IGridTickable, VariableMachine {
+
+    private static final PlaneModels MODELS = new PlaneModels("part/display_mon_off", "part/display_mon_on");
+
+    private static final Pattern CLIENT_VAR_TOKEN = Pattern.compile("&(s\\^[a-z0-9_\\.:]+(?:%\\d+)?|[A-Za-z0-9_]+)");
+    private static final Pattern CLIENT_STOCK_TOKEN = Pattern.compile("&s\\^([a-z0-9_\\.:]+)(?:%(\\d+))?");
+
+    public byte spin = 0; // 0-3
+    public String textValue = "";
+    public HashMap<String, String> variables = new HashMap<>();
+    public boolean reRegister = true;
+    public String identifier = randomHexId();
+    public boolean mode = true;
+    public int fontSize;
+    public boolean margin = false;
+    public boolean center = false;
+
+    @PartModels
+    public static List<IPartModel> getModels() {
+        return MODELS.getModels();
+    }
+
+    public DisplayPart(IPartItem<?> partItem) {
+        super(partItem);
+        this.getMainNode()
+                .setIdlePowerUsage(1)
+                .addService(IGridTickable.class, this);
+    }
+
+    public static String randomHexId() {
+        SecureRandom rand = new SecureRandom();
+        StringBuilder sb = new StringBuilder(4);
+        for (int i = 0; i < 4; i++) sb.append(Integer.toHexString(rand.nextInt(16)).toUpperCase());
+        return sb.toString();
+    }
+
+    @Override
+    public String getId() {
+        return this.identifier;
+    }
+
+    @Override
+    public void notifyVariable(String name, String value, DataControllerBE db) {
+        this.variables.put(name, value);
+        if (getLevel() != null && !getLevel().isClientSide()) {
+            String packed;
+            if (this.getGridNode() != null && !this.getGridNode().getGrid().getMachines(DataControllerBE.class).isEmpty()) {
+                packed = this.variables.entrySet().stream()
+                        .map(e -> e.getKey() + "=" + e.getValue())
+                        .collect(Collectors.joining("|"));
+            } else {
+                packed = "";
+            }
+            var packet = new DisplayValuePacket(this.getBlockEntity().getBlockPos(), this.textValue, this.getSide(), this.spin, packed, this.fontSize, this.mode, this.margin, this.center);
+            PacketDistributor.sendToAllPlayers(packet);
+        }
+    }
+
+    @Override
+    public void getBoxes(IPartCollisionHelper bch) {
+        bch.addBox(0, 0, 15.5, 16, 16, 16);
+    }
+
+    @Override
+    public float getCableConnectionLength(AECableType cable) {
+        return 1;
+    }
+
+    @Override
+    public IPartModel getStaticModels() {
+        return MODELS.getModel(this.isPowered(), this.isActive());
+    }
+
+    @Override
+    public @Nullable AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
+        return new DisplayMenu(containerId, playerInventory, this);
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return super.getDisplayName();
+    }
+
+    @Override
+    public boolean onUseItemOn(ItemStack itemStack, Player p, InteractionHand hand, Vec3 pos) {
+        if (itemStack.getItem() instanceof IMemoryCard) {
+            return super.onUseItemOn(itemStack, p, hand, pos);
+        }
+
+        if (!p.getCommandSenderWorld().isClientSide()) {
+            MenuOpener.open(CrazyMenuRegistrar.DISPLAY_MENU.get(), p, MenuLocators.forPart(this));
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void readFromNBT(CompoundTag extra, HolderLookup.Provider registries) {
+        super.readFromNBT(extra, registries);
+        if (extra.contains("textvalue")) this.textValue = extra.getString("textvalue");
+        if (extra.contains("spin")) this.spin = extra.getByte("spin");
+        if (extra.contains("ident")) this.identifier = extra.getString("ident");
+        if (extra.contains("mode")) this.mode = extra.getBoolean("mode");
+        if (extra.contains("margin")) this.margin = extra.getBoolean("margin");
+        if (extra.contains("center")) this.center = extra.getBoolean("center");
+
+        if (getLevel() != null && !isClientSide()) {
+            String packed = this.variables.entrySet().stream()
+                    .map(e -> e.getKey() + "=" + e.getValue())
+                    .collect(Collectors.joining("|"));
+
+            var packet = new DisplayValuePacket(this.getBlockEntity().getBlockPos(), this.textValue, this.getSide(), this.spin, packed, fontSize, mode, margin, center);
+            PacketDistributor.sendToAllPlayers(packet);
+        }
+    }
+
+    @Override
+    public void writeToNBT(CompoundTag extra, HolderLookup.Provider registries) {
+        super.writeToNBT(extra, registries);
+        extra.putString("textvalue", this.textValue);
+        extra.putByte("spin", this.spin);
+        extra.putString("ident", this.identifier);
+        extra.putBoolean("mode", this.mode);
+        extra.putBoolean("margin", this.margin);
+        extra.putBoolean("center", this.center);
+    }
+
+    @Override
+    public boolean requireDynamicRender() {
+        return true;
+    }
+
+    @Override
+    public final void onPlacement(Player player) {
+        super.onPlacement(player);
+        final byte rotation = (byte) (Mth.floor(player.getYRot() * 4F / 360F + 2.5D) & 3);
+        if (getSide() == Direction.UP || getSide() == Direction.DOWN) {
+            this.spin = rotation;
+        }
+    }
+
+    private void recomputeStockVariablesAndNotify() {
+        if (this.getLevel() == null || this.getLevel().isClientSide()) return;
+
+        String txt = this.textValue == null ? "" : this.textValue;
+        Pattern p = Pattern.compile("&(s\\^[\\w:]+(?:%\\d+)?)");
+        Matcher m = p.matcher(txt);
+
+        int seen = 0;
+
+        while (m.find()) {
+            String token = m.group(1);
+            String core = token;
+            long divisor = 1L;
+
+            int pct = token.indexOf('%');
+            if (pct >= 0) {
+                core = token.substring(0, pct);
+                try {
+                    int pow = Integer.parseInt(token.substring(pct + 1));
+                    if (pow > 0) divisor = (long) Math.pow(10, pow);
+                } catch (NumberFormatException ignored) {
+                }
+            }
+
+            if (!core.startsWith("s^")) continue;
+            seen++;
+
+            String itemId = core.substring(2);
+            long amount = getItemAmountInME(itemId);
+            long display = Math.round((double) amount / (double) divisor);
+
+            String old = this.variables.get(token);
+            String now = String.valueOf(display);
+            if (!Objects.equals(old, now)) {
+                this.variables.put(token, now);
+            }
+        }
+
+        if (seen > 0) {
+            String packed = this.variables.entrySet().stream()
+                    .map(e -> e.getKey() + "=" + e.getValue())
+                    .collect(Collectors.joining("|"));
+
+            var packet = new DisplayValuePacket(
+                    this.getBlockEntity().getBlockPos(),
+                    this.textValue,
+                    this.getSide(),
+                    this.spin,
+                    packed,
+                    this.fontSize,
+                    this.mode,
+                    this.margin,
+                    this.center
+            );
+            PacketDistributor.sendToAllPlayers(packet);
+        }
+    }
+
+    private long getItemAmountInME(String id) {
+        try {
+            var node = this.getGridNode();
+            if (node == null) return 0;
+            var grid = node.getGrid();
+            if (grid == null) return 0;
+
+            var storage = grid.getService(IStorageService.class);
+            if (storage == null) return 0;
+
+            var rl = ResourceLocation.parse(id);
+
+            var item = BuiltInRegistries.ITEM.get(rl);
+            if (item != Items.AIR) {
+                var itemKey = AEItemKey.of(new ItemStack(item));
+                if (itemKey == null) return 0;
+
+                long total = 0L;
+                var avail = storage.getInventory().getAvailableStacks();
+                for (var gs : avail) {
+                    if (gs.getKey() instanceof AEItemKey key && key.getItem() == itemKey.getItem()) {
+                        total += gs.getLongValue();
+                    }
+                }
+                if (total > 0) return total;
+            }
+
+            var fluid = BuiltInRegistries.FLUID.get(rl);
+            if (fluid != net.minecraft.world.level.material.Fluids.EMPTY) {
+                var fluidKey = AEFluidKey.of(fluid);
+                if (fluidKey == null) return 0;
+
+                long total = 0L;
+                var avail = storage.getInventory().getAvailableStacks();
+                for (var gs : avail) {
+                    if (gs.getKey().equals(fluidKey)) {
+                        total += gs.getLongValue();
+                    }
+                }
+                return total;
+            }
+
+            return 0;
+        } catch (Throwable t) {
+            return 0;
+        }
+    }
+
+    public void updateController(String value) {
+        this.textValue = value;
+
+        try {
+            var node = this.getGridNode();
+            if (node == null) { this.reRegister = true; return; }
+            var grid = node.getGrid();
+            if (grid == null) { this.reRegister = true; return; }
+
+            var machines = grid.getMachines(DataControllerBE.class);
+            if (machines == null || machines.isEmpty()) { this.reRegister = true; return; }
+            var controller = machines.stream().findFirst().orElse(null);
+
+            int maxVars = controller.getMaxVariables();
+            if (maxVars <= 0) { this.reRegister = true; return; }
+
+            controller.removeNotification(this.identifier);
+
+            Pattern pattern = Pattern.compile("&\\w+");
+            Matcher matcher = pattern.matcher(value);
+            while (matcher.find()) {
+                String word = matcher.group();
+                String name = word.substring(1);
+                controller.registerNotification(this.identifier, name, this.identifier, this.getClass());
+            }
+
+            this.reRegister = false;
+
+            if (!isClientSide()) {
+                recomputeStockVariablesAndNotify();
+            }
+        } catch (Throwable t) {
+            this.reRegister = true;
+        }
+    }
+
+    private record Transformation(float tx, float ty, float tz, float yRotation, float xRotation) { }
+
+    public boolean isStructureComplete(Set<DisplayPart> group) {
+        if (group == null || group.isEmpty()) return false;
+
+        Direction side = this.getSide();
+
+        Set<Pair<Integer, Integer>> coords = new HashSet<>();
+
+        int minRow = Integer.MAX_VALUE, maxRow = Integer.MIN_VALUE;
+        int minCol = Integer.MAX_VALUE, maxCol = Integer.MIN_VALUE;
+
+        for (DisplayPart part : group) {
+            BlockPos pos = part.getBlockEntity().getBlockPos();
+            int col = 0, row = 0;
+
+            switch (side) {
+                case NORTH, SOUTH -> { col = pos.getX(); row = pos.getY(); }
+                case EAST, WEST -> { col = pos.getZ(); row = pos.getY(); }
+                case UP, DOWN -> { col = pos.getX(); row = pos.getZ(); }
+            }
+
+            coords.add(Pair.of(col, row));
+            minCol = Math.min(minCol, col);
+            maxCol = Math.max(maxCol, col);
+            minRow = Math.min(minRow, row);
+            maxRow = Math.max(maxRow, row);
+        }
+
+        for (int col = minCol; col <= maxCol; col++) {
+            for (int row = minRow; row <= maxRow; row++) {
+                if (!coords.contains(Pair.of(col, row))) return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void applyFacingTransform(PoseStack poseStack) {
+        Transformation t = getFacingTransformation(getSide());
+        poseStack.translate(t.tx, t.ty, t.tz);
+        poseStack.mulPose(Axis.YP.rotationDegrees(t.yRotation));
+        poseStack.mulPose(Axis.XP.rotationDegrees(t.xRotation));
+        if (t.xRotation != 0) applySpinTransformation(poseStack, t.xRotation);
+    }
+
+    private Transformation getFacingTransformation(Direction facing) {
+        float tx = 0, ty = 0, tz = 0, yRot = 0, xRot = 0;
+        switch (facing) {
+            case SOUTH -> { tx = 0;    ty = 1;    tz = 0.5F; }
+            case WEST  -> { tx = 0.5F; ty = 1;    tz = 0;     yRot = -90F; }
+            case EAST  -> { tx = 0.5F; ty = 1;    tz = 1;     yRot = 90F; }
+            case NORTH -> { tx = 1;    ty = 1;    tz = 0.5F;  yRot = 180F; }
+            case UP    -> { tx = 0;    ty = 0.5F; tz = 0;     xRot = -90F; }
+            case DOWN  -> { tx = 1;    ty = 0.5F; tz = 0;     xRot = 90F; }
+        }
+        return new Transformation(tx, ty, tz, yRot, xRot);
+    }
+
+    private void applySpinTransformation(PoseStack poseStack, float upRotation) {
+        float theSpin = 0.0F;
+        if (upRotation == 90F) {
+            switch (this.spin) {
+                case 0 -> { theSpin = 0.0F;    poseStack.translate(-1, 1, 0); }
+                case 1 -> { theSpin = 90.0F;   poseStack.translate(-1, 0, 0); }
+                case 2 -> { theSpin = 180.0F;  poseStack.translate(0, 0, 0); }
+                case 3 -> { theSpin = -90.0F;  poseStack.translate(0, 1, 0); }
+            }
+        } else {
+            switch (this.spin) {
+                case 0 -> { theSpin = 0.0F;    poseStack.translate(0, 0, 0); }
+                case 1 -> { theSpin = -90.0F;  poseStack.translate(1, 0, 0); }
+                case 2 -> { theSpin = 180.0F;  poseStack.translate(1, -1, 0); }
+                case 3 -> { theSpin = 90.0F;   poseStack.translate(0, -1, 0); }
+            }
+        }
+        poseStack.mulPose(Axis.ZP.rotationDegrees(theSpin));
+    }
+
+    public Set<DisplayPart> getConnectedGrid() {
+        Direction side = getSide();
+
+        if (side == Direction.UP || side == Direction.DOWN) {
+            return Set.of(this);
+        }
+
+        if (!this.mode) {
+            return Set.of(this);
+        }
+
+        Direction left  = side.getCounterClockWise();
+        Direction right = side.getClockWise();
+
+        Set<BlockPos> visited = new HashSet<>();
+        LinkedHashSet<DisplayPart> result = new LinkedHashSet<>();
+        ArrayDeque<DisplayPart> q = new ArrayDeque<>();
+        q.add(this);
+
+        while (!q.isEmpty()) {
+            DisplayPart cur = q.poll();
+            if (cur == null || cur.getSide() != side) continue;
+
+            BlockPos pos = cur.getBlockEntity().getBlockPos();
+            if (!visited.add(pos)) continue;
+
+            result.add(cur);
+
+            DisplayPart up   = cur.getNeighbor(Direction.UP);
+            DisplayPart down = cur.getNeighbor(Direction.DOWN);
+            DisplayPart l    = cur.getNeighbor(left);
+            DisplayPart r    = cur.getNeighbor(right);
+
+            if (up   != null) q.add(up);
+            if (down != null) q.add(down);
+            if (l    != null) q.add(l);
+            if (r    != null) q.add(r);
+        }
+
+        if (result.isEmpty()) {
+            return Set.of(this);
+        }
+
+        return isStructureComplete(result) ? result : Set.of(this);
+    }
+
+
+    @Nullable
+    public DisplayPart getNeighbor(Direction dir) {
+        if (getLevel() == null) return null;
+        BlockPos neighborPos = getBlockEntity().getBlockPos().relative(dir);
+        BlockEntity be = getLevel().getBlockEntity(neighborPos);
+        if (be instanceof CableBusBlockEntity cbbe) {
+            var part = cbbe.getPart(getSide());
+            if (part instanceof DisplayPart neighbor && neighbor.getSide() == this.getSide()) {
+                return neighbor;
+            }
+        }
+        return null;
+    }
+
+
+    public boolean isRenderOrigin(Set<DisplayPart> group) {
+        Direction side = this.getSide();
+
+        DisplayPart origin = group.stream()
+                .min(
+                        Comparator
+                                .comparingInt((DisplayPart dp) -> dp.getBlockEntity().getBlockPos().getY())
+                                .reversed()
+                                .thenComparingInt(dp -> {
+                                    var p = dp.getBlockEntity().getBlockPos();
+                                    return switch (side) {
+                                        case NORTH -> -p.getX();
+                                        case SOUTH -> p.getX();
+                                        case EAST  -> -p.getZ();
+                                        case WEST  -> p.getZ();
+                                        default    -> -p.getX();
+                                    };
+                                })
+                )
+                .orElse(this);
+        return this == origin;
+    }
+
+
+    @Override
+    public TickingRequest getTickingRequest(IGridNode node) {
+        return new TickingRequest(20, 20, false);
+    }
+
+    @Override
+    public TickRateModulation tickingRequest(IGridNode node, int ticksSinceLastCall) {
+        if (this.getGridNode() == null || this.getGridNode().getGrid() == null || this.getGridNode().getGrid().getMachines(DataControllerBE.class).isEmpty()) {
+            this.reRegister = true;
+        } else {
+            DataControllerBE controller = getMainNode().getGrid().getMachines(DataControllerBE.class).stream().toList().get(0);
+            if (controller.getMaxVariables() <= 0) {
+                this.reRegister = true;
+            } else if (this.reRegister) {
+                this.reRegister = false;
+                updateController(this.textValue);
+            }
+        }
+
+        if (getLevel() != null && !isClientSide()) {
+            recomputeStockVariablesAndNotify();
+            String packed = this.variables.entrySet().stream()
+                    .map(e -> e.getKey() + "=" + e.getValue())
+                    .collect(Collectors.joining("|"));
+
+            var packet = new DisplayValuePacket(this.getBlockEntity().getBlockPos(), this.textValue, this.getSide(), this.spin, packed, this.fontSize, this.mode, this.margin, this.center);
+            PacketDistributor.sendToAllPlayers(packet);
+        }
+        return TickRateModulation.IDLE;
+    }
+
+    public static Pair<Integer, Integer> getGridSize(List<DisplayPart> sorted, Direction side) {
+        int minCol = Integer.MAX_VALUE, maxCol = Integer.MIN_VALUE;
+        int minRow = Integer.MAX_VALUE, maxRow = Integer.MIN_VALUE;
+
+        for (DisplayPart part : sorted) {
+            BlockPos pos = part.getBlockEntity().getBlockPos();
+            int col = 0, row = 0;
+
+            switch (side) {
+                case NORTH, SOUTH -> { col = pos.getX(); row = pos.getY(); }
+                case EAST, WEST -> { col = pos.getZ(); row = pos.getY(); }
+                case UP, DOWN -> { col = pos.getX(); row = pos.getZ(); }
+            }
+
+            minCol = Math.min(minCol, col);
+            maxCol = Math.max(maxCol, col);
+            minRow = Math.min(minRow, row);
+            maxRow = Math.max(maxRow, row);
+        }
+
+        int width = maxCol - minCol + 1;
+        int height = maxRow - minRow + 1;
+
+        return Pair.of(width, height);
+    }
+
+    private record TextWithColors(List<Component> lines, @Nullable Integer backgroundColor) { }
+
+    private TextWithColors parseStyledText(String rawText) {
+        List<Component> lines = new ArrayList<>();
+        Integer bgColor = null;
+
+        String[] rawLines = rawText.split("&nl");
+        Pattern colorPattern = Pattern.compile("(&[cb])([0-9A-Fa-f]{6})");
+
+        for (String rawLine : rawLines) {
+            MutableComponent lineComponent = Component.empty();
+            Style currentStyle = Style.EMPTY;
+
+            int indentLevel = 0;
+            while (rawLine.startsWith(">>")) {
+                indentLevel++;
+                rawLine = rawLine.substring(2);
+            }
+
+            if (indentLevel > 0) {
+                String indentVisual = "|>".repeat(indentLevel) + " ";
+                Style indentStyle = Style.EMPTY.withColor(0x888888);
+                lineComponent.append(Component.literal(indentVisual).withStyle(indentStyle));
+            }
+
+            if (rawLine.matches("^[*-] .*")) {
+                char bulletChar = '•';
+                Style bulletStyle = Style.EMPTY.withColor(0xAAAAAA);
+                lineComponent.append(Component.literal(" " + bulletChar + " ").withStyle(bulletStyle));
+                rawLine = rawLine.substring(2);
+            }
+
+            Matcher colorMatcher = colorPattern.matcher(rawLine);
+            int lastColorEnd = 0;
+
+            while (colorMatcher.find()) {
+                if (colorMatcher.start() > lastColorEnd) {
+                    String between = rawLine.substring(lastColorEnd, colorMatcher.start());
+                    lineComponent.append(parseMarkdownSegment(between, currentStyle));
+                }
+
+                String type = colorMatcher.group(1);
+                String hex = colorMatcher.group(2);
+                int color = Integer.parseInt(hex, 16);
+
+                if (type.equals("&c")) {
+                    currentStyle = currentStyle.withColor(color);
+                } else if (type.equals("&b")) {
+                    bgColor = color;
+                }
+
+                lastColorEnd = colorMatcher.end();
+            }
+
+            if (lastColorEnd < rawLine.length()) {
+                String tail = rawLine.substring(lastColorEnd);
+                lineComponent.append(parseMarkdownSegment(tail, currentStyle));
+            }
+
+            lines.add(lineComponent);
+        }
+
+        return new TextWithColors(lines, bgColor);
+    }
+
+    private Component parseMarkdownSegment(String text, Style baseStyle) {
+        Pattern pattern = Pattern.compile("(\\*\\*|\\*|__|~~|`)(.+?)\\1");
+        Matcher matcher = pattern.matcher(text);
+
+        MutableComponent result = Component.empty();
+        int last = 0;
+
+        while (matcher.find()) {
+            if (matcher.start() > last) {
+                String plain = text.substring(last, matcher.start());
+                result.append(Component.literal(plain).withStyle(baseStyle));
+            }
+
+            String tag = matcher.group(1);
+            String content = matcher.group(2);
+
+            Style newStyle = baseStyle;
+            switch (tag) {
+                case "**" -> newStyle = baseStyle.withBold(true);
+                case "*"  -> newStyle = baseStyle.withItalic(true);
+                case "__" -> newStyle = baseStyle.withUnderlined(true);
+                case "~~" -> newStyle = baseStyle.withStrikethrough(true);
+            }
+
+            result.append(parseMarkdownSegment(content, newStyle));
+            last = matcher.end();
+        }
+
+        if (last < text.length()) {
+            String tail = text.substring(last);
+            result.append(Component.literal(tail).withStyle(baseStyle));
+        }
+
+        return result;
+    }
+
+    private String resolveTokensClientSide(String input) {
+        if (input == null || input.isEmpty()) return "";
+
+        StringBuilder sb = new StringBuilder();
+        Matcher m = CLIENT_VAR_TOKEN.matcher(input);
+        while (m.find()) {
+            String key = m.group(1);
+            String withAmp = "&" + key;
+
+            String repl = this.variables.get(key);
+            if (repl == null) {
+                Matcher sm = CLIENT_STOCK_TOKEN.matcher(withAmp);
+                if (sm.matches()) {
+                    String itemId = sm.group(1);
+                    String powStr = sm.group(2);
+                    String baseVal = this.variables.get("s^" + itemId);
+                    if (baseVal != null) {
+                        try {
+                            long amount = Long.parseLong(baseVal);
+                            long divisor = 1L;
+                            if (powStr != null) {
+                                int pow = Integer.parseInt(powStr);
+                                if (pow > 0) divisor = (long) Math.pow(10, pow);
+                            }
+                            long display = Math.round((double) amount / (double) divisor);
+                            repl = String.valueOf(display);
+                        } catch (NumberFormatException ignored) { }
+                    }
+                }
+            }
+
+            if (repl == null) {
+                repl = this.variables.getOrDefault(key, withAmp);
+            }
+
+            m.appendReplacement(sb, Matcher.quoteReplacement(repl));
+        }
+        m.appendTail(sb);
+        return sb.toString();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @Override
+    public void renderDynamic(float partialTicks, PoseStack poseStack, MultiBufferSource buffers, int light, int overlay) {
+        if (!isPowered() || textValue.isEmpty()) return;
+
+        Set<DisplayPart> group = getConnectedGrid();
+        if (group.isEmpty() || !isRenderOrigin(group)) return;
+
+        List<DisplayPart> sorted = new ArrayList<>(group);
+        sorted.sort(Comparator.comparingInt((DisplayPart dp) -> dp.getBlockEntity().getBlockPos().getY())
+                .thenComparingInt(dp -> dp.getBlockEntity().getBlockPos().getX()));
+
+        var dims = getGridSize(sorted, getSide());
+        int widthBlocks  = Math.max(1, dims.getFirst());
+        int heightBlocks = Math.max(1, dims.getSecond());
+
+        Font font = Minecraft.getInstance().font;
+
+        String resolved = resolveTokensClientSide(this.textValue);
+        String[] rawLines = resolved.split("&nl");
+
+        TextWithColors parsed = parseStyledText(String.join("&nl", rawLines));
+        List<Component> styledLines = parsed.lines();
+        Integer bgColor = parsed.backgroundColor();
+
+        int lineCount = styledLines.size();
+        int maxLineWidth = 1;
+        for (int i = 0; i < lineCount; i++) {
+            int textW = font.width(styledLines.get(i));
+            if (textW > maxLineWidth) maxLineWidth = textW;
+        }
+        int totalTextHeight = Math.max(1, lineCount * font.lineHeight);
+
+        float pxW = 64f * widthBlocks;
+        float pxH = 64f * heightBlocks;
+
+        float marginFrac = this.margin ? 0.03f : 0.0f;
+        float marginX = pxW * marginFrac, marginY = pxH * marginFrac;
+        float usableW = Math.max(1f, pxW - 2f * marginX);
+        float usableH = Math.max(1f, pxH - 2f * marginY);
+
+        float scale;
+        if (fontSize <= 0) {
+            float fitX = usableW / Math.max(1, maxLineWidth);
+            float fitY = usableH / Math.max(1, totalTextHeight);
+            scale = (1f / 64f) * Math.min(fitX, fitY);
+        } else {
+            scale = fontSize / (64f * 8f);
+        }
+
+        if (!(scale > 0f) || Float.isInfinite(scale)) {
+            scale = 1f / 64f;
+        }
+
+        int maxVisibleLines = (fontSize > 0)
+                ? Math.max(0, (int) Math.floor((usableH / 64f) / scale / font.lineHeight))
+                : lineCount;
+
+        poseStack.pushPose();
+        applyFacingTransform(poseStack);
+        poseStack.translate(0, 0, 0.51f);
+        if (bgColor != null) {
+            drawBackground(poseStack, buffers, widthBlocks, heightBlocks, 0xFF000000 | bgColor);
+        }
+        poseStack.popPose();
+
+        poseStack.pushPose();
+        applyFacingTransform(poseStack);
+        poseStack.translate(0, 0, 0.52f);
+
+        poseStack.translate(marginX / 64f, -marginY / 64f, 0);
+        poseStack.scale(scale, -scale, scale);
+
+        int linesToDraw = Math.min(lineCount, maxVisibleLines);
+
+        float availTextW = (usableW / 64f) / scale;
+        float availTextH = (usableH / 64f) / scale;
+
+        if (this.center) {
+            float drawnH = (fontSize <= 0 ? totalTextHeight : linesToDraw * font.lineHeight);
+            float extraY = Math.max(0f, (availTextH - drawnH) / 2f);
+            poseStack.translate(0, +extraY, 0);
+        }
+
+        for (int i = 0; i < linesToDraw; i++) {
+            Component styled = styledLines.get(i);
+            float y = i * font.lineHeight;
+
+            int lineTextW = font.width(styled);
+            float xOffset = 0f;
+            if (this.center) xOffset = Math.max(0f, (availTextW - lineTextW) / 2f);
+
+            font.drawInBatch(styled, xOffset, y, 0xFFFFFF, false,
+                    poseStack.last().pose(), buffers, Font.DisplayMode.NORMAL, 0, light);
+        }
+
+        poseStack.popPose();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private void drawBackground(PoseStack poseStack, MultiBufferSource buffers, int blocksWide, int blocksHigh, int color) {
+        var buffer = buffers.getBuffer(RenderType.gui());
+        Matrix4f matrix = poseStack.last().pose();
+
+        int r = (color >> 16) & 0xFF;
+        int g = (color >> 8) & 0xFF;
+        int b = (color & 0xFF);
+        int a = (color >> 24) & 0xFF;
+
+        buffer.addVertex(matrix, 0, -(float) blocksHigh, 0).setColor(r, g, b, a);
+        buffer.addVertex(matrix, (float) blocksWide, -(float) blocksHigh, 0).setColor(r, g, b, a);
+        buffer.addVertex(matrix, (float) blocksWide, 0, 0).setColor(r, g, b, a);
+        buffer.addVertex(matrix, 0, 0, 0).setColor(r, g, b, a);
+    }
+}
