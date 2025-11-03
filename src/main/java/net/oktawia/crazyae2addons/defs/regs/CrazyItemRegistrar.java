@@ -9,6 +9,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.oktawia.crazyae2addons.CrazyAddons;
 import net.oktawia.crazyae2addons.items.BuilderPatternItem;
 import net.oktawia.crazyae2addons.items.CrazyPatternProviderUpgrade;
+import net.oktawia.crazyae2addons.items.Nokia3310;
 
 import java.util.List;
 
@@ -36,6 +37,9 @@ public class CrazyItemRegistrar {
 
     public static final DeferredItem<Item> BUILDER_PATTERN = ITEMS.register("builder_pattern",
             () -> new BuilderPatternItem(new Item.Properties()));
+
+    public static final DeferredItem<Item> NOKIA_3310 = ITEMS.register("nokia_3310",
+            () -> new Nokia3310(new Item.Properties()));
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

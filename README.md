@@ -67,7 +67,7 @@
 - [ ] Looting Upgrade Card
 - [ ] Virtual Mob Representation (this thing to place mob keys in patterns)
 - [ ] NBT View Cell (if possible)
-- [ ] Structure Gadget
+- [x] Nokia 3310
 - [ ] Structure Pattern Copy Debug Item (dev tool)
 - [ ] Super Singularity
 - [ ] Tag View Cell
@@ -130,7 +130,7 @@
 - [x] Autobuilder Preview
 - [ ] Energy Storage Preview
 - [ ] Entropy Cradle Preview
-- [ ] Held Structure Gadget Preview
+- [x] Held Structure Gadget Preview
 - [ ] Mob Farm Preview
 - [ ] Penrose Sphere Preview
 - [ ] Research Station Preview

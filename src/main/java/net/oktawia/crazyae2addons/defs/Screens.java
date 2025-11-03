@@ -3,14 +3,8 @@ package net.oktawia.crazyae2addons.defs;
 import appeng.init.client.InitScreens;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.oktawia.crazyae2addons.defs.regs.CrazyMenuRegistrar;
-import net.oktawia.crazyae2addons.menus.AutoBuilderMenu;
-import net.oktawia.crazyae2addons.menus.BrokenPatternProviderMenu;
-import net.oktawia.crazyae2addons.menus.BuilderPatternMenu;
-import net.oktawia.crazyae2addons.menus.CrazyPatternProviderMenu;
-import net.oktawia.crazyae2addons.screens.AutoBuilderScreen;
-import net.oktawia.crazyae2addons.screens.BrokenPatternProviderScreen;
-import net.oktawia.crazyae2addons.screens.BuilderPatternScreen;
-import net.oktawia.crazyae2addons.screens.CrazyPatternProviderScreen;
+import net.oktawia.crazyae2addons.menus.*;
+import net.oktawia.crazyae2addons.screens.*;
 
 public final class Screens {
 
@@ -39,6 +33,12 @@ public final class Screens {
                 CrazyMenuRegistrar.BUILDER_PATTERN_MENU.get(),
                 BuilderPatternScreen<BuilderPatternMenu>::new,
                 "/screens/builder_pattern.json"
+        );
+        InitScreens.register(
+                event,
+                CrazyMenuRegistrar.NOKIA3310_MENU.get(),
+                Nokia3310Screen<Nokia3310Menu>::new,
+                "/screens/nokia3310.json"
         );
     }
 }

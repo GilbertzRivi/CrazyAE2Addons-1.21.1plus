@@ -8,6 +8,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.oktawia.crazyae2addons.CrazyAddons;
 import net.oktawia.crazyae2addons.menus.BuilderPatternMenu;
+import net.oktawia.crazyae2addons.menus.Nokia3310Menu;
 
 import java.nio.charset.StandardCharsets;
 
@@ -41,10 +42,9 @@ public record SendLongStringToServerPacket(String data) implements CustomPacketP
             ServerPlayer sender = (ServerPlayer) context.player();
             if (sender.containerMenu instanceof BuilderPatternMenu menu) {
                 menu.updateData(packet.data());
+            } else if (sender.containerMenu instanceof Nokia3310Menu menu) {
+                menu.updateData(packet.data());
             }
-//            else if (sender != null && sender.containerMenu instanceof GadgetMenu menu) {
-//                menu.updateData(packet.data());
-//            }
         });
     }
 }

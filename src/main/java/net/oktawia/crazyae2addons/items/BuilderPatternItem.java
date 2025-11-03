@@ -102,9 +102,8 @@ public class BuilderPatternItem extends AEBaseItem implements IMenuItem {
 
                         ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(state.getBlock());
 
-                        if (blockId == null) continue;
-
                         var itemKey = AEItemKey.of(state.getBlock().asItem());
+                        if (itemKey == null) continue;
                         if (itemKey.fuzzyEquals(AEItemKey.of(Blocks.AIR.asItem()), FuzzyMode.IGNORE_ALL)) continue;
 
                         StringBuilder fullId = new StringBuilder(blockId.toString());

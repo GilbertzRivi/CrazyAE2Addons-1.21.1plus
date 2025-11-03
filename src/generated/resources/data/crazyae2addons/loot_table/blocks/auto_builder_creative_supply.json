@@ -11,11 +11,11 @@
             "entries": [
                 {
                     "type": "minecraft:item",
-                    "name": "crazyae2addons:crazy_pattern_provider"
+                    "name": "crazyae2addons:auto_builder_creative_supply"
                 }
             ],
             "rolls": 1.0
         }
     ],
-    "random_sequence": "crazyae2addons:blocks/crazy_pattern_provider"
+    "random_sequence": "crazyae2addons:blocks/auto_builder_creative_supply"
 }

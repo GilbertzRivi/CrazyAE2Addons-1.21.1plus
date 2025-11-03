@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.oktawia.crazyae2addons.CrazyAddons;
 import net.oktawia.crazyae2addons.screens.BuilderPatternScreen;
+import net.oktawia.crazyae2addons.screens.Nokia3310Screen;
 
 import java.nio.charset.StandardCharsets;
 
@@ -42,10 +43,9 @@ public record SendLongStringToClientPacket(String data) implements CustomPacketP
             Minecraft mc = Minecraft.getInstance();
             if (mc.screen instanceof BuilderPatternScreen<?> screen) {
                 screen.setProgram(packet.data());
+            } else if (mc.screen instanceof Nokia3310Screen<?> screen) {
+                screen.setProgram(packet.data());
             }
-//            else if (mc.screen instanceof GadgetScreen<?> screen) {
-//                screen.setProgram(packet.data());
-//            }
         });
     }
 }

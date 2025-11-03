@@ -45,6 +45,22 @@ repositories {
     maven {
         url "https://maven.tterrag.com/"
     }
+    maven { url = "https://mvn.devos.one/snapshots/" }
+    maven {
+        name = 'GTCEu Maven'
+        url = 'https://maven.gtceu.com'
+        content {
+            includeGroup 'com.gregtechceu.gtceu'
+        }
+    }
+    maven {
+        name 'Configuration'
+        url 'https://repo.repsy.io/mvn/toma/public/'
+    }
+    maven {
+        name 'Configuration (alternative/backup)'
+        url 'https://api.repsy.io/mvn/toma/public/'
+    }
 }
 
 base {
@@ -113,7 +129,10 @@ dependencies {
     implementation "de.mari_023:ae2wtlib_api:19.2.6"
     implementation "de.mari_023:ae2wtlib:19.2.6"
     implementation "com.lowdragmc.ldlib:ldlib-neoforge-1.21.1:1.0.35.a"
+    compileOnly "com.gregtechceu.gtceu:gtceu-1.21.1:7.1.0-SNAPSHOT"
     // OPTIONAL, FOR DEV
+    implementation "curse.maven:flux-networks-248020:6089446"
+    implementation "com.gregtechceu.gtceu:gtceu-1.21.1:7.1.0-SNAPSHOT"
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {

@@ -11,6 +11,8 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.oktawia.crazyae2addons.defs.Screens;
 import net.oktawia.crazyae2addons.defs.UpgradeCards;
 import net.oktawia.crazyae2addons.defs.regs.*;
+import net.oktawia.crazyae2addons.items.Nokia3310;
+import net.oktawia.crazyae2addons.logic.BuildScheduler;
 import net.oktawia.crazyae2addons.network.SendLongStringToClientPacket;
 import net.oktawia.crazyae2addons.network.SendLongStringToServerPacket;
 import net.oktawia.crazyae2addons.network.SyncBlockClientPacket; // Zaimportuj swoje pakiety
@@ -18,6 +20,7 @@ import net.oktawia.crazyae2addons.network.SyncBlockClientPacket; // Zaimportuj s
 // import net.oktawia.crazyae2addons.network.*;
 
 import net.oktawia.crazyae2addons.network.UpdatePatternsPacket;
+import net.oktawia.crazyae2addons.renderer.PreviewTooltipRenderer;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
@@ -51,8 +54,10 @@ public class CrazyAddons {
         modEventBus.addListener(CrazyAddons::initCapabilities);
 
         modEventBus.addListener(this::registerPayloadHandlers);
+        modEventBus.register(PreviewTooltipRenderer.class);
 
         NeoForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(BuildScheduler.class);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, CrazyConfig.COMMON_SPEC);
     }
@@ -101,6 +106,11 @@ public class CrazyAddons {
                     AECapabilities.IN_WORLD_GRID_NODE_HOST, type.get(),
                     (be, context) -> (IInWorldGridNodeHost) be);
         }
+        event.registerItem(
+                Capabilities.EnergyStorage.ITEM,
+                (stack, context) -> new Nokia3310.ItemEnergyStorage(stack),
+                CrazyItemRegistrar.NOKIA_3310.get()
+        );
 
 //        var partEvent = new RegisterPartCapabilitiesEvent();
 //        partEvent.addHostType(AEBlockEntities.CABLE_BUS.get());

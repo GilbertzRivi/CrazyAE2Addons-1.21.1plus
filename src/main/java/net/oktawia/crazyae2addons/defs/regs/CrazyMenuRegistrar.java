@@ -12,10 +12,8 @@ import net.oktawia.crazyae2addons.entities.AutoBuilderBE;
 import net.oktawia.crazyae2addons.entities.BrokenPatternProviderBE;
 import net.oktawia.crazyae2addons.entities.CrazyPatternProviderBE;
 import net.oktawia.crazyae2addons.logic.BuilderPatternHost;
-import net.oktawia.crazyae2addons.menus.AutoBuilderMenu;
-import net.oktawia.crazyae2addons.menus.BrokenPatternProviderMenu;
-import net.oktawia.crazyae2addons.menus.BuilderPatternMenu;
-import net.oktawia.crazyae2addons.menus.CrazyPatternProviderMenu;
+import net.oktawia.crazyae2addons.logic.GadgetHost;
+import net.oktawia.crazyae2addons.menus.*;
 
 
 public class CrazyMenuRegistrar {
@@ -43,6 +41,9 @@ public class CrazyMenuRegistrar {
 
     public static final DeferredHolder<MenuType<?>, MenuType<BuilderPatternMenu>> BUILDER_PATTERN_MENU =
             reg(id("builder_pattern"), BuilderPatternMenu::new, BuilderPatternHost.class);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<Nokia3310Menu>> NOKIA3310_MENU =
+            reg(id("nokia3310"), Nokia3310Menu::new, GadgetHost.class);
 
     public static void register(IEventBus eventBus) {
         MENU_TYPES.register(eventBus);
